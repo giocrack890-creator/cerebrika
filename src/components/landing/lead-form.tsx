@@ -55,13 +55,13 @@ export function LeadForm({
   }
 
   return (
-    <section id={id} className="scroll-mt-28 px-5 py-8 sm:px-6">
-      <div className="mx-auto max-w-[1080px] rounded-[28px] border border-black/10 bg-[#FBF8F3] px-6 py-10 sm:px-12 sm:py-12">
-        <p className="text-[12px] font-semibold tracking-[0.22em] text-[#6B4F3B] uppercase">{kicker}</p>
-        <h2 className="font-display mt-3 max-w-[18ch] text-[clamp(2rem,4vw,3.2rem)] leading-[1.02] tracking-[-0.03em]">
+    <section id={id} className="scroll-mt-28 py-6">
+      <div className="rounded-[32px] bg-[#EA580C] px-6 py-12 text-white sm:px-12">
+        <p className="text-[11px] font-semibold tracking-[0.18em]">{kicker.toUpperCase()}</p>
+        <h2 className="mt-3 max-w-3xl text-[clamp(2.2rem,5vw,4rem)] leading-[0.92] font-bold tracking-[-0.05em]">
           {title}
         </h2>
-        <p className="mt-4 max-w-xl text-lg leading-relaxed text-[#5E564E]">{body}</p>
+        <p className="mt-4 max-w-xl text-lg leading-relaxed text-white/85">{body}</p>
         {success ? (
           <p role="status" className="mt-8 text-base font-medium">
             {success}
@@ -78,7 +78,7 @@ export function LeadForm({
               required
               autoComplete="email"
               placeholder={site.lead.emailPlaceholder}
-              className="w-full rounded-full border border-black/15 bg-[#F3EEE6] px-5 py-3 text-base outline-none"
+              className="w-full rounded-full bg-white px-5 py-3 text-base text-[#111111] outline-none"
             />
             <div className="absolute left-[-9999px] h-0 overflow-hidden" aria-hidden="true">
               <label>
@@ -86,13 +86,17 @@ export function LeadForm({
                 <input name="company" tabIndex={-1} autoComplete="off" />
               </label>
             </div>
-            <button type="submit" disabled={pending} className="btn btn-secondary shrink-0 px-5 py-3 text-[15px] disabled:opacity-60">
+            <button
+              type="submit"
+              disabled={pending}
+              className="shrink-0 rounded-full bg-black px-5 py-3 text-[11px] font-semibold tracking-[0.14em] text-white disabled:opacity-60"
+            >
               {pending ? site.lead.submitting : button}
             </button>
           </form>
         )}
         {error ? (
-          <p role="alert" className="mt-4 text-sm text-[#8E3F2A]">
+          <p role="alert" className="mt-4 text-sm text-white">
             {error}
           </p>
         ) : null}

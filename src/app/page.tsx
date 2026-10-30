@@ -3,21 +3,24 @@ import { Suspense } from "react";
 import { connection } from "next/server";
 import { BuyButton, CheckoutProvider } from "@/components/landing/checkout";
 import { LeadForm } from "@/components/landing/lead-form";
-import { CoverScene } from "@/components/store/cover";
 import { StoreFooter } from "@/components/store/footer";
-import { StoreHeader } from "@/components/store/header";
+import { StoreChrome } from "@/components/store/header";
 import { ProductCard } from "@/components/store/product-card";
-import { TrustStrip } from "@/components/store/trust";
 import {
+  catalogHref,
+  categories,
   categoryLabel,
   filterProducts,
   getFlagship,
   isCategoryId,
-  products,
   resolvePriceArs,
 } from "@/content/products";
 import { site } from "@/content/site";
 import { formatArs } from "@/lib/format";
+
+const cornerClass = "rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.16em] text-white";
+const barClass =
+  "shrink-0 rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.14em] whitespace-nowrap text-white";
 
 type Query = { q?: string | string[]; categoria?: string | string[] };
 
@@ -28,7 +31,7 @@ function one(value: string | string[] | undefined): string {
 
 export default function HomePage({ searchParams }: { searchParams: Promise<Query> }) {
   return (
-    <Suspense fallback={<StoreHeader />}>
+    <Suspense fallback={null}>
       <LiveHome searchParams={searchParams} />
     </Suspense>
   );
@@ -45,87 +48,76 @@ async function LiveHome({ searchParams }: { searchParams: Promise<Query> }) {
   const flagship = getFlagship();
   const price = resolvePriceArs(flagship);
   const priceLabel = price ? formatArs(price) : null;
-  const destacados = products.filter((product) => product.status === "available");
-  const nuevos = products.filter((product) => product.status === "coming_soon");
 
   return (
     <CheckoutProvider productSlug={flagship.slug} productTitle={flagship.title} priceLabel={priceLabel}>
-      <StoreHeader q={q} categoria={activeCategory} />
-      <main>
+      <StoreChrome
+        q={q}
+        categoria={activeCategory}
+        bar={priceLabel ? `${site.chrome.bar} · ${priceLabel}` : site.chrome.bar}
+        corner={<BuyButton label={site.chrome.buy} className={cornerClass} />}
+        barAction={<BuyButton label={site.chrome.barButton} className={barClass} />}
+      />
+      <main className="px-3 pt-28 pb-28 sm:px-6 lg:px-10">
         {browsing ? (
-          <section className="mx-auto max-w-[1120px] px-4 py-10 sm:px-6">
-            <p className="text-[12px] font-semibold tracking-[0.2em] text-[#6B4F3B] uppercase">Catálogo</p>
-            <h1 className="font-display mt-3 text-[clamp(2.2rem,5vw,3.8rem)] tracking-[-0.03em]">
+          <section id="inicio" className="px-3 pt-6 pb-8 text-center">
+            <p className="text-xs font-semibold tracking-[0.22em] uppercase">Catálogo</p>
+            <h1 className="mx-auto mt-4 max-w-4xl text-[clamp(2.6rem,7vw,5.4rem)] leading-[0.88] font-bold tracking-[-0.055em]">
               {activeCategory ? categoryLabel(activeCategory) : "Resultados"}
-              {q ? `: ${q}` : ""}
+              {q ? ` · ${q}` : ""}
             </h1>
-            <p className="mt-3 text-[#5E564E]">
+            <p className="mt-5 text-black/70">
               {filtered.length === 0
-                ? "Ningún ebook coincide. Probá otra palabra o volvé a todo el catálogo."
+                ? "Ningún ebook coincide. Probá otra palabra."
                 : `${filtered.length} ${filtered.length === 1 ? "ebook" : "ebooks"}.`}
             </p>
-            {filtered.length === 0 ? (
-              <Link href="/" className="mt-6 inline-flex text-sm font-semibold underline underline-offset-4">
-                Ver todo
-              </Link>
-            ) : (
-              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered.map((product) => (
-                  <ProductCard key={product.slug} product={product} />
-                ))}
-              </div>
-            )}
           </section>
         ) : (
-          <>
-            <section className="hero-wash mx-auto grid max-w-[1120px] items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:py-16">
-              <div>
-                <p className="text-[12px] font-semibold tracking-[0.2em] text-[#6B4F3B] uppercase">Destacado · Docentes</p>
-                <h1 className="font-display mt-3 max-w-[14ch] text-[clamp(2.6rem,6vw,4.8rem)] leading-[0.96] tracking-[-0.035em]">
-                  {flagship.promise}
-                </h1>
-                <p className="mt-5 max-w-xl text-lg leading-relaxed text-[#3F3832]">{flagship.description}</p>
-                <p className="mt-5 text-sm font-semibold">{priceLabel ? `Pago único · ${priceLabel}` : site.checkout.missingPrice}</p>
-                <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <BuyButton label="Comprar" className="btn btn-primary px-6 py-3.5 text-[16px]" />
-                  <Link href={`/productos/${flagship.slug}`} className="btn btn-secondary px-5 py-3.5 text-[15px]">
-                    Ver el ebook
-                  </Link>
-                </div>
-              </div>
-              <Link href={`/productos/${flagship.slug}`} aria-label={flagship.title}>
-                <CoverScene product={flagship} />
-              </Link>
-            </section>
-            <TrustStrip />
-            <section className="mx-auto max-w-[1120px] px-4 py-12 sm:px-6">
-              <h2 className="font-display text-[clamp(2rem,4vw,3rem)] tracking-[-0.03em]">Destacado</h2>
-              <p className="mt-2 max-w-xl text-[#5E564E]">El único ebook que ya se puede comprar.</p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:max-w-md">
-                {destacados.map((product) => (
-                  <ProductCard key={product.slug} product={product} />
-                ))}
-              </div>
-            </section>
-            <section className="mx-auto max-w-[1120px] px-4 pb-4 sm:px-6">
-              <h2 className="font-display text-[clamp(2rem,4vw,3rem)] tracking-[-0.03em]">Nuevo en el catálogo</h2>
-              <p className="mt-2 max-w-xl text-[#5E564E]">Todavía no están a la venta. En cada ficha podés pedir que te avisemos.</p>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {nuevos.map((product) => (
-                  <ProductCard key={product.slug} product={product} />
-                ))}
-              </div>
-            </section>
-            <section id="catalogo" className="mx-auto max-w-[1120px] scroll-mt-28 px-4 py-12 sm:px-6">
-              <h2 className="font-display text-[clamp(2rem,4vw,3rem)] tracking-[-0.03em]">Todos los ebooks</h2>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {products.map((product) => (
-                  <ProductCard key={product.slug} product={product} />
-                ))}
-              </div>
-            </section>
-          </>
+          <section id="inicio" className="flex min-h-[88svh] flex-col items-center justify-center px-3 pb-10 text-center">
+            <p className="text-xs font-semibold tracking-[0.22em] uppercase">Cerebrika · tienda de ebooks</p>
+            <h1 className="mt-6 max-w-5xl text-[clamp(3.1rem,8.6vw,7.4rem)] leading-[0.88] font-bold tracking-[-0.055em]">
+              Ebooks cortos para usar la IA.
+            </h1>
+            <p className="mt-8 max-w-xl text-lg leading-relaxed text-black/70">
+              El de docentes ya se compra. Los demás están en camino: te avisamos, sin cobrar.
+            </p>
+            <p className="mt-6 text-sm font-medium tracking-tight">
+              {priceLabel ? `${site.checkout.priceLabel} · ${priceLabel}` : site.checkout.missingPrice}
+            </p>
+            <p className="mt-5 text-[11px] font-semibold tracking-[0.16em]">MERCADO PAGO · LLEGA POR MAIL · PAGO ÚNICO</p>
+          </section>
         )}
+        <nav aria-label="Filtrar categorías" className="mb-6 flex gap-2 overflow-x-auto px-1 pb-2">
+          <Link
+            href={catalogHref({ q })}
+            aria-current={activeCategory ? undefined : "page"}
+            className={`shrink-0 rounded-full px-4 py-3 text-[11px] font-semibold tracking-[0.14em] ${activeCategory ? "bg-white" : "bg-black text-white"}`}
+          >
+            TODOS
+          </Link>
+          {categories.map((category) => {
+            const selected = activeCategory === category.id;
+            return (
+              <Link
+                key={category.id}
+                href={catalogHref({ categoria: category.id, q })}
+                aria-current={selected ? "page" : undefined}
+                className={`shrink-0 rounded-full px-4 py-3 text-[11px] font-semibold tracking-[0.14em] ${selected ? "bg-black text-white" : "bg-white"}`}
+              >
+                {category.label.toUpperCase()}
+              </Link>
+            );
+          })}
+        </nav>
+        <section id="catalogo" className="relative">
+          {filtered.length === 0 ? (
+            <Link href="/" className={`${barClass} mt-4`}>
+              VER TODO
+            </Link>
+          ) : (
+            filtered.map((product) => <ProductCard key={product.slug} product={product} />)
+          )}
+        </section>
         <LeadForm />
         <StoreFooter />
       </main>

@@ -55,9 +55,9 @@ export const site = {
     { title: "Sin suscripción", body: "Un solo pago. No hay cuota ni renovación." },
   ],
   chrome: {
-    buy: "Quiero el ebook",
+    buy: "COMPRAR",
     bar: "Planificá tu semana en 1 hora",
-    barButton: "Comprar",
+    barButton: "COMPRAR AHORA →",
     brand: "Cerebrika",
     clockLabel: "Buenos Aires",
     nav: [

@@ -92,10 +92,10 @@ export function CheckoutProvider({
       >
           <form
           onSubmit={onSubmit}
-          className="relative w-full max-w-[440px] rounded-[28px] bg-[#FBF8F3] p-8 text-[#1C1714] shadow-[0_30px_80px_rgba(0,0,0,0.28)]"
+          className="relative w-full max-w-[440px] rounded-[32px] bg-white p-8 text-[#111111] shadow-[0_30px_80px_rgba(0,0,0,0.18)]"
         >
           <div className="flex items-start justify-between gap-4">
-            <h2 id={titleId} className="font-display text-3xl tracking-[-0.03em]">
+            <h2 id={titleId} className="text-3xl font-bold tracking-[-0.045em]">
               {site.checkout.title}
             </h2>
             <button
@@ -106,8 +106,8 @@ export function CheckoutProvider({
               {site.checkout.close}
             </button>
           </div>
-          <p className="mt-3 text-base leading-relaxed text-[#5E564E]">{productTitle}</p>
-          <p className="mt-2 text-base leading-relaxed text-[#5E564E]">{site.checkout.body}</p>
+          <p className="mt-3 text-base leading-relaxed text-black/70">{productTitle}</p>
+          <p className="mt-2 text-base leading-relaxed text-black/70">{site.checkout.body}</p>
           <p className="mt-5 text-sm font-semibold tracking-tight">
             {site.checkout.priceLabel}
             {priceLabel ? ` · ${priceLabel}` : ""}
@@ -122,7 +122,7 @@ export function CheckoutProvider({
             required
             autoComplete="email"
             placeholder={site.checkout.emailPlaceholder}
-            className="mt-2 w-full rounded-full border border-black/10 bg-[#F3EEE6] px-5 py-3 text-base outline-none"
+            className="mt-2 w-full rounded-full border border-black/10 bg-[#F5F2EB] px-5 py-3 text-base outline-none"
           />
           <div className="absolute left-[-9999px] h-0 overflow-hidden" aria-hidden="true">
             <label>
@@ -131,14 +131,18 @@ export function CheckoutProvider({
             </label>
           </div>
           {error ? (
-            <p role="alert" className="mt-4 text-sm text-[#8E3F2A]">
+            <p role="alert" className="mt-4 text-sm text-[#DC2626]">
               {error}
             </p>
           ) : null}
-          <button type="submit" className="btn btn-primary mt-6 w-full px-5 py-3.5 text-[15px]" disabled={pending || !priceLabel}>
+          <button
+            type="submit"
+            className="mt-6 w-full rounded-full bg-black px-5 py-3 text-[11px] font-semibold tracking-[0.16em] text-white disabled:opacity-60"
+            disabled={pending || !priceLabel}
+          >
             {pending ? site.checkout.submitting : site.checkout.submit}
           </button>
-          {!priceLabel ? <p className="mt-3 text-sm text-[#5E564E]">{site.checkout.missingPrice}</p> : null}
+          {!priceLabel ? <p className="mt-3 text-sm text-black/60">{site.checkout.missingPrice}</p> : null}
         </form>
       </dialog>
     </CheckoutContext.Provider>
