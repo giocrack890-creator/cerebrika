@@ -37,12 +37,14 @@ export function StoreChrome({
   bar,
   corner,
   barAction,
+  showBar = true,
 }: {
   q?: string;
   categoria?: string;
   bar: string;
   corner: React.ReactNode;
   barAction: React.ReactNode;
+  showBar?: boolean;
 }) {
   const active = isCategoryId(categoria) ? categoria : "";
 
@@ -63,7 +65,7 @@ export function StoreChrome({
       </Link>
       <div className="fixed top-5 right-4 z-50 hidden sm:block lg:right-6 lg:top-7">{corner}</div>
       <form
-        action="/"
+        action="/catalogo"
         method="get"
         role="search"
         className="fixed top-[4.6rem] right-4 left-4 z-40 sm:top-5 sm:right-auto sm:left-20 sm:w-52"
@@ -107,12 +109,14 @@ export function StoreChrome({
           );
         })}
       </nav>
-      <div className="fixed inset-x-3 bottom-3 z-50 flex items-center gap-3 rounded-full bg-white py-2 pr-2 pl-4 shadow-[0_12px_40px_rgba(17,17,17,0.14)] lg:inset-x-auto lg:bottom-8 lg:left-1/2 lg:w-auto lg:-translate-x-1/2 lg:pl-6">
-        <p className="min-w-0 flex-1 text-[13px] leading-tight font-medium tracking-[-0.03em] lg:max-w-sm lg:flex-none lg:text-[15px]">
-          {bar}
-        </p>
-        {barAction}
-      </div>
+      {showBar ? (
+        <div className="fixed inset-x-3 bottom-3 z-50 flex items-center gap-3 rounded-full bg-white py-2 pr-2 pl-4 shadow-[0_12px_40px_rgba(17,17,17,0.14)] lg:inset-x-auto lg:bottom-8 lg:left-1/2 lg:w-auto lg:-translate-x-1/2 lg:pl-6">
+          <p className="min-w-0 flex-1 text-[13px] leading-tight font-medium tracking-[-0.03em] lg:max-w-sm lg:flex-none lg:text-[15px]">
+            {bar}
+          </p>
+          {barAction}
+        </div>
+      ) : null}
       <p className="pointer-events-none fixed bottom-8 left-8 z-40 hidden text-xs tracking-tight text-black/70 lg:block">
         {site.chrome.brand}
       </p>

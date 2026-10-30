@@ -41,3 +41,10 @@ export function getEbookStorage(): { bucket: string; path: string } | null {
 export function isHttpsUrl(url: string): boolean {
   return url.startsWith("https://");
 }
+
+/** Número con código de país, solo dígitos. Vacío o inválido = no hay botón. */
+export function getWhatsappNumber(): string | null {
+  const raw = process.env.WHATSAPP_NUMBER?.replace(/\D/g, "") ?? "";
+  if (raw.length < 8 || raw.length > 15) return null;
+  return raw;
+}

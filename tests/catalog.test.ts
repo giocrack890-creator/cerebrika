@@ -5,13 +5,26 @@ import {
   resolvePaidProduct,
   resolvePriceArs,
   getFlagship,
+  storeConfig,
 } from "@/content/products";
 
 describe("catálogo", () => {
   it("filtra por categoría y por texto", () => {
-    expect(filterProducts({ categoria: "docentes" }).map((product) => product.slug)).toEqual(["ia-para-docentes"]);
-    expect(filterProducts({ q: "tareas claras" }).map((product) => product.slug)).toEqual(["ia-para-reuniones"]);
+    const docentes = filterProducts({ categoria: "docentes" }).map((product) => product.slug);
+    expect(docentes).toContain("ia-para-docentes");
+    expect(docentes.length).toBeGreaterThan(1);
+    expect(filterProducts({ q: "parcial del lunes" }).map((product) => product.slug)).toEqual(["ia-para-el-parcial"]);
     expect(filterProducts({ categoria: "inexistente", q: "" }).length).toBeGreaterThan(1);
+  });
+
+  it("no publica promo, reseñas ni vendidos inventados", () => {
+    for (const product of filterProducts({})) {
+      expect(product.compareAtArs).toBeNull();
+      expect(product.promoSavingsArs).toBeNull();
+      expect(product.rating).toBeNull();
+      expect(product.soldCount).toBeNull();
+    }
+    expect(storeConfig.announcement).toBe("");
   });
 
   it("solo cobra el ebook que está a la venta", () => {

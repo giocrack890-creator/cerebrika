@@ -67,6 +67,7 @@ async function LiveProduct({ params }: { params: Promise<{ slug: string }> }) {
   const avisoHref = `#aviso-${product.slug}`;
   const chrome = (
     <StoreChrome
+      showBar={false}
       bar={comingSoon ? "Próximamente · te avisamos" : priceLabel ? `${product.promise} · ${priceLabel}` : product.promise}
       corner={
         comingSoon ? (

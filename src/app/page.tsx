@@ -58,7 +58,7 @@ async function LiveHome({ searchParams }: { searchParams: Promise<Query> }) {
         corner={<BuyButton label={site.chrome.buy} className={cornerClass} />}
         barAction={<BuyButton label={site.chrome.barButton} className={barClass} />}
       />
-      <main className="px-3 pt-28 pb-28 sm:px-6 lg:px-10">
+      <main className="px-3 pt-28 pb-28 sm:px-6 lg:px-10 xl:pl-28">
         {browsing ? (
           <section id="inicio" className="px-3 pt-6 pb-8 text-center">
             <p className="text-xs font-semibold tracking-[0.22em] uppercase">Catálogo</p>
@@ -87,37 +87,26 @@ async function LiveHome({ searchParams }: { searchParams: Promise<Query> }) {
             <p className="mt-5 text-[11px] font-semibold tracking-[0.16em]">MERCADO PAGO · LLEGA POR MAIL · PAGO ÚNICO</p>
           </section>
         )}
-        <nav aria-label="Filtrar categorías" className="mb-6 flex gap-2 overflow-x-auto px-1 pb-2">
-          <Link
-            href={catalogHref({ q })}
-            aria-current={activeCategory ? undefined : "page"}
-            className={`shrink-0 rounded-full px-4 py-3 text-[11px] font-semibold tracking-[0.14em] ${activeCategory ? "bg-white" : "bg-black text-white"}`}
-          >
-            TODOS
+        <nav aria-label="Categorías" className="mb-6 flex gap-2 overflow-x-auto px-1 pb-2">
+          <Link href="/catalogo" className="shrink-0 rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.14em] text-white">
+            CATÁLOGO
           </Link>
-          {categories.map((category) => {
-            const selected = activeCategory === category.id;
-            return (
-              <Link
-                key={category.id}
-                href={catalogHref({ categoria: category.id, q })}
-                aria-current={selected ? "page" : undefined}
-                className={`shrink-0 rounded-full px-4 py-3 text-[11px] font-semibold tracking-[0.14em] ${selected ? "bg-black text-white" : "bg-white"}`}
-              >
-                {category.label.toUpperCase()}
-              </Link>
-            );
-          })}
-        </nav>
-        <section id="catalogo" className="relative">
-          {filtered.length === 0 ? (
-            <Link href="/" className={`${barClass} mt-4`}>
-              VER TODO
+          {categories.map((category) => (
+            <Link
+              key={category.id}
+              href={catalogHref({ categoria: category.id })}
+              className="shrink-0 rounded-full bg-white px-4 py-3 text-[11px] font-semibold tracking-[0.14em]"
+            >
+              {category.label.toUpperCase()}
             </Link>
-          ) : (
-            filtered.map((product) => <ProductCard key={product.slug} product={product} />)
-          )}
-        </section>
+          ))}
+        </nav>
+        <ProductCard product={flagship} />
+        <p className="px-2 py-6">
+          <Link href="/catalogo" className={barClass}>
+            VER LOS {filtered.length} EBOOKS →
+          </Link>
+        </p>
         <LeadForm />
         <StoreFooter />
       </main>
