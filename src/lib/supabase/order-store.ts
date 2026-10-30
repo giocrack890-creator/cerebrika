@@ -96,7 +96,84 @@ export function createSupabaseOrderStore(): OrderStore {
         .eq("download_token", token)
         .maybeSingle();
       if (error) throw error;
-      return data ? mapRow(data as OrderRow) : null;
+      if (data) return mapRow(data as OrderRow);
+
+      const item = await supabase
+        .from("order_items")
+        .select("product_slug, download_token, download_expires_at, order_id")
+        .eq("download_token", token)
+        .maybeSingle();
+      if (item.error) throw item.error;
+      if (!item.data) return null;
+      const parent = await supabase.from("orders").select("*").eq("id", item.data.order_id).maybeSingle();
+      if (parent.error) throw parent.error;
+      if (!parent.data) return null;
+      return {
+        ...mapRow(parent.data as OrderRow),
+        productId: String(item.data.product_slug),
+        productSlug: String(item.data.product_slug),
+        downloadToken: String(item.data.download_token),
+        downloadExpiresAt: String(item.data.download_expires_at),
+      };
+    },
+
+    async saveItems(orderId, items) {
+      const rows = items.map((item) => ({
+        order_id: Number(orderId),
+        product_slug: item.slug,
+        title: item.title,
+        unit_price: item.unitPrice,
+        quantity: 1,
+        download_token: item.downloadToken,
+        download_expires_at: item.downloadExpiresAt,
+      }));
+      const { error } = await supabase.from("order_items").upsert(rows, { onConflict: "order_id,product_slug" });
+      if (error) throw error;
+    },
+
+    async listDownloadsByEmail(email) {
+      const orders = await supabase.from("orders").select("id, product_slug, download_token, download_expires_at").eq("email", email);
+      if (orders.error) throw orders.error;
+      const ids = (orders.data ?? []).map((row) => row.id);
+      const items = ids.length
+        ? await supabase
+            .from("order_items")
+            .select("order_id, product_slug, title, download_token, download_expires_at")
+            .in("order_id", ids)
+        : { data: [], error: null };
+      if (items.error) throw items.error;
+      const byOrder = new Map<number, { title: string; slug: string; downloadToken: string; downloadExpiresAt: string }[]>();
+      for (const row of items.data ?? []) {
+        const list = byOrder.get(Number(row.order_id)) ?? [];
+        list.push({
+          title: String(row.title),
+          slug: String(row.product_slug),
+          downloadToken: String(row.download_token),
+          downloadExpiresAt: String(row.download_expires_at),
+        });
+        byOrder.set(Number(row.order_id), list);
+      }
+      return (orders.data ?? []).flatMap((row) => {
+        const saved = byOrder.get(Number(row.id));
+        if (saved?.length) return saved;
+        return [
+          {
+            title: String(row.product_slug),
+            slug: String(row.product_slug),
+            downloadToken: String(row.download_token),
+            downloadExpiresAt: String(row.download_expires_at),
+          },
+        ];
+      });
+    },
+
+    async extendDownloads(email, expiresAt) {
+      const orders = await supabase.from("orders").update({ download_expires_at: expiresAt }).eq("email", email).select("id");
+      if (orders.error) throw orders.error;
+      const ids = (orders.data ?? []).map((row) => row.id);
+      if (!ids.length) return;
+      const items = await supabase.from("order_items").update({ download_expires_at: expiresAt }).in("order_id", ids);
+      if (items.error) throw items.error;
     },
 
     async claimEmailSend(id, now) {

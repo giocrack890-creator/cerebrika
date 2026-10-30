@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
+import { usePathname } from "next/navigation";
 import { catalogHref, categories, isCategoryId } from "@/content/products";
 import { site } from "@/content/site";
+import { useCart } from "@/components/store/cart-provider";
 
 function BuenosAiresClock() {
   const [time, setTime] = useState<string | null>(null);
@@ -31,6 +33,26 @@ function BuenosAiresClock() {
   );
 }
 
+function PersonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <circle cx="12" cy="8" r="3.2" />
+      <path d="M5 19.2c1.4-3 3.8-4.4 7-4.4s5.6 1.4 7 4.4" />
+    </svg>
+  );
+}
+
+function BagIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+      <path d="M6.5 8h11l-.8 11.2a1 1 0 0 1-1 .8H8.3a1 1 0 0 1-1-.8L6.5 8Z" />
+      <path d="M9 8V6.8A3 3 0 0 1 12 3.8 3 3 0 0 1 15 6.8V8" />
+    </svg>
+  );
+}
+
+const tabClass = "border-b-2 border-transparent pb-1 text-[12px] font-semibold tracking-[0.16em]";
+
 export function StoreChrome({
   q = "",
   categoria = "",
@@ -46,7 +68,34 @@ export function StoreChrome({
   barAction: React.ReactNode;
   showBar?: boolean;
 }) {
-  const active = isCategoryId(categoria) ? categoria : "";
+  const pathname = usePathname();
+  const activeCategory = isCategoryId(categoria) ? categoria : "";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
+  const menuId = useId();
+  const categoriesId = useId();
+  const cart = useCart();
+
+  const inicio = pathname === "/";
+  const catalogo = pathname.startsWith("/catalogo") && !activeCategory;
+  const quienes = pathname.startsWith("/quienes-somos");
+  const contacto = pathname.startsWith("/contacto");
+
+  const categoryLinks = (
+    <ul className="space-y-1">
+      {categories.map((category) => (
+        <li key={category.id}>
+          <Link
+            href={catalogHref({ categoria: category.id, q })}
+            className="block rounded-full px-4 py-2 text-sm font-semibold tracking-[0.08em] hover:bg-black/5"
+            aria-current={activeCategory === category.id ? "page" : undefined}
+          >
+            {category.label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <>
@@ -56,59 +105,102 @@ export function StoreChrome({
       >
         Saltar al contenido
       </a>
-      <Link
-        href="/"
-        className="fixed top-4 left-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-black text-sm font-bold tracking-[-0.06em] text-[#F5F2EB] lg:left-6 lg:top-6"
-        aria-label={site.chrome.brand}
-      >
-        C
-      </Link>
-      <div className="fixed top-5 right-4 z-50 hidden sm:block lg:right-6 lg:top-7">{corner}</div>
-      <form
-        action="/catalogo"
-        method="get"
-        role="search"
-        className="fixed top-[4.6rem] right-4 left-4 z-40 sm:top-5 sm:right-auto sm:left-20 sm:w-52"
-      >
-        {active ? <input type="hidden" name="categoria" value={active} /> : null}
-        <label className="sr-only" htmlFor="catalogo-q">
-          Buscar ebooks
-        </label>
-        <input
-          id="catalogo-q"
-          name="q"
-          defaultValue={q}
-          placeholder="Buscar"
-          className="w-full rounded-full bg-white px-4 py-2.5 text-sm shadow-[0_12px_40px_rgba(17,17,17,0.12)] outline-none"
-        />
-      </form>
-      <nav
-        aria-label="Categorías"
-        className="fixed top-1/2 left-6 z-50 hidden -translate-y-1/2 flex-col gap-1 rounded-full bg-white p-2 shadow-[0_12px_40px_rgba(17,17,17,0.12)] xl:flex"
-      >
-        <Link
-          href={catalogHref({ q })}
-          aria-label="Todo el catálogo"
-          aria-current={active ? undefined : "true"}
-          className={`flex h-11 w-11 items-center justify-center rounded-full text-[10px] font-bold tracking-tight ${active ? "hover:bg-black/5" : "bg-black text-white"}`}
-        >
-          TD
-        </Link>
-        {categories.map((category) => {
-          const selected = active === category.id;
-          return (
-            <Link
-              key={category.id}
-              href={catalogHref({ categoria: category.id, q })}
-              aria-label={category.label}
-              aria-current={selected ? "true" : undefined}
-              className={`flex h-11 w-11 items-center justify-center rounded-full text-[10px] font-bold tracking-tight ${selected ? "bg-black text-white" : "hover:bg-black/5"}`}
-            >
-              {category.label.slice(0, 2).toUpperCase()}
+      <header className="sticky top-0 z-50">
+        <div className="flex items-center gap-6 bg-[#F5F2EB] px-4 py-4 sm:px-8">
+          <Link href="/" className="shrink-0 text-[15px] font-bold tracking-[0.18em]">
+            CEREBRIKA
+            <sup className="ml-0.5 text-[9px] font-semibold tracking-normal">TM</sup>
+          </Link>
+          <nav aria-label="Secciones" className="hidden items-center gap-6 lg:flex">
+            <Link href="/" aria-current={inicio ? "page" : undefined} className={`${tabClass} ${inicio ? "border-black" : "text-black/70"}`}>
+              INICIO
             </Link>
-          );
-        })}
-      </nav>
+            <Link href="/catalogo" aria-current={catalogo ? "page" : undefined} className={`${tabClass} ${catalogo ? "border-black" : "text-black/70"}`}>
+              CATÁLOGO
+            </Link>
+            <div className="relative">
+              <button
+                type="button"
+                className={`${tabClass} ${activeCategory ? "border-black" : "text-black/70"}`}
+                aria-expanded={categoriesOpen}
+                aria-controls={categoriesId}
+                onClick={() => setCategoriesOpen((open) => !open)}
+              >
+                CATEGORÍAS
+              </button>
+              {categoriesOpen ? (
+                <div id={categoriesId} className="absolute top-full left-0 z-50 mt-3 min-w-52 rounded-[20px] bg-white p-3 shadow-[0_12px_40px_rgba(17,17,17,0.12)]">
+                  {categoryLinks}
+                </div>
+              ) : null}
+            </div>
+            <Link href="/quienes-somos" aria-current={quienes ? "page" : undefined} className={`${tabClass} ${quienes ? "border-black" : "text-black/70"}`}>
+              QUIÉNES SOMOS
+            </Link>
+            <Link href="/contacto" aria-current={contacto ? "page" : undefined} className={`${tabClass} ${contacto ? "border-black" : "text-black/70"}`}>
+              CONTACTO
+            </Link>
+          </nav>
+          <div className="ml-auto flex items-center gap-3">
+            <div className="hidden sm:block">{corner}</div>
+            <Link href="/contacto" aria-label="Cuenta" className="hidden text-black sm:inline-flex">
+              <PersonIcon />
+            </Link>
+            <button
+              type="button"
+              className="relative text-black"
+              aria-label={cart.slugs.length === 0 ? "Bolsa vacía" : `Bolsa, ${cart.slugs.length} ebooks`}
+              onClick={() => cart.openDrawer()}
+            >
+              <BagIcon />
+              {cart.slugs.length > 0 ? (
+                <span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-black px-1 text-[10px] font-bold text-white">
+                  {cart.slugs.length}
+                </span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              className="inline-flex h-10 w-10 items-center justify-center lg:hidden"
+              aria-expanded={menuOpen}
+              aria-controls={menuId}
+              onClick={() => setMenuOpen(true)}
+            >
+              <span className="sr-only">Abrir menú</span>
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <p className="bg-black px-4 py-2 text-center text-[11px] font-semibold tracking-[0.14em] text-white">
+          PAGO SEGURO MERCADO PAGO · EL PDF LLEGA POR MAIL · SIN SUSCRIPCIÓN
+        </p>
+      </header>
+      {menuOpen ? (
+        <div id={menuId} className="fixed inset-0 z-[70] flex flex-col bg-[#F5F2EB] px-6 py-6 lg:hidden">
+          <div className="flex items-center justify-between">
+            <p className="text-[15px] font-bold tracking-[0.18em]">
+              CEREBRIKA<sup className="ml-0.5 text-[9px]">TM</sup>
+            </p>
+            <button type="button" className="text-[12px] font-semibold tracking-[0.16em]" onClick={() => setMenuOpen(false)}>
+              CERRAR
+            </button>
+          </div>
+          <nav aria-label="Secciones" className="mt-10 flex flex-col gap-5 text-2xl font-bold tracking-[-0.04em]">
+            <Link href="/">Inicio</Link>
+            <Link href="/catalogo">Catálogo</Link>
+            <p className="text-xs font-semibold tracking-[0.16em] text-black/50">CATEGORÍAS</p>
+            {categories.map((category) => (
+              <Link key={category.id} href={catalogHref({ categoria: category.id })} className="text-xl">
+                {category.label}
+              </Link>
+            ))}
+            <Link href="/quienes-somos">Quiénes somos</Link>
+            <Link href="/contacto">Contacto</Link>
+          </nav>
+        </div>
+      ) : null}
       {showBar ? (
         <div className="fixed inset-x-3 bottom-3 z-50 flex items-center gap-3 rounded-full bg-white py-2 pr-2 pl-4 shadow-[0_12px_40px_rgba(17,17,17,0.14)] lg:inset-x-auto lg:bottom-8 lg:left-1/2 lg:w-auto lg:-translate-x-1/2 lg:pl-6">
           <p className="min-w-0 flex-1 text-[13px] leading-tight font-medium tracking-[-0.03em] lg:max-w-sm lg:flex-none lg:text-[15px]">
@@ -117,9 +209,6 @@ export function StoreChrome({
           {barAction}
         </div>
       ) : null}
-      <p className="pointer-events-none fixed bottom-8 left-8 z-40 hidden text-xs tracking-tight text-black/70 lg:block">
-        {site.chrome.brand}
-      </p>
       <BuenosAiresClock />
     </>
   );

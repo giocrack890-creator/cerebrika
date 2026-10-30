@@ -14,6 +14,7 @@ export type NormalizedApprovedPayment = {
   amount: number;
   currency: string;
   productId: string;
+  items?: { slug: string; title: string; unitPrice: number }[];
   metadata?: Record<string, unknown>;
 };
 
@@ -25,4 +26,6 @@ export type FetchedPayment = {
   email: string | null;
   externalReference: string | null;
   productId: string | null;
+  productSlugs?: string | null;
+  coupon?: string | null;
 };

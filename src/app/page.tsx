@@ -58,7 +58,7 @@ async function LiveHome({ searchParams }: { searchParams: Promise<Query> }) {
         corner={<BuyButton label={site.chrome.buy} className={cornerClass} />}
         barAction={<BuyButton label={site.chrome.barButton} className={barClass} />}
       />
-      <main className="px-3 pt-28 pb-28 sm:px-6 lg:px-10 xl:pl-28">
+      <main className="px-3 pt-8 pb-28 sm:px-6 lg:px-10">
         {browsing ? (
           <section id="inicio" className="px-3 pt-6 pb-8 text-center">
             <p className="text-xs font-semibold tracking-[0.22em] uppercase">Catálogo</p>

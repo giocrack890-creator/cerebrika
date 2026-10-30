@@ -1,4 +1,5 @@
 import { WebhookSignatureValidator } from "mercadopago";
+import { quoteCart } from "@/lib/cart-math";
 import type { DeliverResult } from "@/lib/delivery/types";
 import { paymentMatchesProduct } from "@/lib/payments/mercadopago";
 import type { FetchedPayment, NormalizedApprovedPayment } from "@/lib/payments/types";
@@ -93,14 +94,36 @@ export async function handleMercadoPagoWebhook(
     };
   }
 
+  if (!payment.email) {
+    throw new Error("approved_payment_missing_email");
+  }
+
+  const cartSlugs = payment.externalReference?.startsWith("cart:")
+    ? (payment.productSlugs ?? "").split(",").map((slug) => slug.trim()).filter(Boolean)
+    : [];
+  if (cartSlugs.length > 0) {
+    const quote = quoteCart(cartSlugs, payment.coupon || undefined);
+    if (!quote.ok || Math.abs(payment.amount - quote.total) > 1) {
+      console.error("webhook_mercadopago_cart_mismatch", payment.id);
+      return { status: 200, body: { ok: true, action: "ignored", reason: "cart_mismatch" } };
+    }
+    const result = await deps.deliver({
+      provider: "mercadopago",
+      providerPaymentId: payment.id || dataId,
+      email: payment.email,
+      amount: payment.amount,
+      currency: payment.currency,
+      productId: quote.lines[0].slug,
+      items: quote.lines,
+      metadata: { source: "mercadopago", product_slugs: cartSlugs.join(",") },
+    });
+    return { status: 200, body: { ok: true, action: result.outcome, orderId: result.orderId } };
+  }
+
   const accepted = deps.acceptProduct(payment);
   if (!accepted || !paymentMatchesProduct(payment, accepted.productId)) {
     console.error("webhook_mercadopago_unrelated", payment.id);
     return { status: 200, body: { ok: true, action: "ignored", reason: "unrelated_product" } };
-  }
-
-  if (!payment.email) {
-    throw new Error("approved_payment_missing_email");
   }
 
   const result = await deps.deliver({
@@ -110,6 +133,7 @@ export async function handleMercadoPagoWebhook(
     amount: payment.amount,
     currency: payment.currency,
     productId: accepted.productId,
+    items: [{ slug: accepted.productId, title: accepted.productTitle, unitPrice: payment.amount }],
     metadata: { source: "mercadopago" },
   });
 

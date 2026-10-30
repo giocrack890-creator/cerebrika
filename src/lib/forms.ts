@@ -4,11 +4,13 @@ const requestSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email()),
   company: z.string().optional(),
   slug: z.string().trim().min(1).max(80).optional(),
+  slugs: z.array(z.string().trim().min(1).max(80)).max(20).optional(),
+  coupon: z.string().trim().max(40).optional(),
   source: z.string().trim().min(1).max(80).optional(),
 });
 
 export type ParsedForm =
-  | { ok: true; email: string; honeypot: boolean; slug?: string; source?: string }
+  | { ok: true; email: string; honeypot: boolean; slug?: string; slugs?: string[]; coupon?: string; source?: string }
   | { ok: false; error: string };
 
 export async function parseContactForm(request: Request): Promise<ParsedForm> {
@@ -29,6 +31,8 @@ export async function parseContactForm(request: Request): Promise<ParsedForm> {
     email: parsed.data.email,
     honeypot: Boolean(parsed.data.company?.trim()),
     slug: parsed.data.slug,
+    slugs: parsed.data.slugs,
+    coupon: parsed.data.coupon,
     source: parsed.data.source,
   };
 }

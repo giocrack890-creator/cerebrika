@@ -67,11 +67,28 @@ async function LiveCatalog({ searchParams }: { searchParams: Promise<Query> }) {
         corner={<BuyButton label={site.chrome.buy} className={cornerClass} />}
         barAction={<BuyButton label={site.chrome.barButton} className={barClass} />}
       />
-      <main className="px-3 pt-32 pb-32 sm:px-6 lg:px-10 xl:pl-28">
+      <main className="px-3 pt-8 pb-32 sm:px-6 lg:px-10">
         <p className="text-xs font-semibold tracking-[0.22em] uppercase">Cerebrika</p>
         <h1 className="mt-3 max-w-4xl text-[clamp(3rem,7vw,6rem)] leading-[0.88] font-bold tracking-[-0.055em]">
           {activeCategory ? categoryLabel(activeCategory) : "El catálogo"}
         </h1>
+        <form action="/catalogo" method="get" role="search" className="mt-6 flex max-w-md gap-2">
+          {activeCategory ? <input type="hidden" name="categoria" value={activeCategory} /> : null}
+          {orden !== "destacados" ? <input type="hidden" name="orden" value={orden} /> : null}
+          <label className="sr-only" htmlFor="buscar-catalogo">
+            Buscar ebooks
+          </label>
+          <input
+            id="buscar-catalogo"
+            name="q"
+            defaultValue={q}
+            placeholder="Buscar un ebook"
+            className="w-full rounded-full bg-white px-5 py-3 text-base outline-none"
+          />
+          <button type="submit" className="shrink-0 rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.14em] text-white">
+            BUSCAR
+          </button>
+        </form>
         <p className="mt-4 max-w-xl text-lg text-black/70">
           {filtered.length} {filtered.length === 1 ? "ebook" : "ebooks"}.
           {q ? ` Búsqueda: ${q}.` : ""} Solo el de docentes se puede comprar.

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { BuyButton } from "@/components/landing/checkout";
 import { FaqList } from "@/components/landing/faq";
+import { CartActions } from "@/components/store/cart-provider";
 import { LeadForm } from "@/components/landing/lead-form";
 import { BookCover } from "@/components/store/book-cover";
 import { ChapterList } from "@/components/store/chapter-list";
@@ -34,11 +34,11 @@ export function ProductView({
         AVISAME →
       </a>
     ) : (
-      <BuyButton key={key} label={site.chrome.barButton} className={blackPill} />
+      <CartActions key={key} slug={product.slug} />
     );
 
   return (
-    <article className="px-3 pt-28 pb-32 sm:px-6 lg:px-10 xl:pl-28">
+    <article className="px-3 pt-8 pb-32 sm:px-6 lg:px-10">
       <RememberView slug={product.slug} />
       <p className="text-[11px] font-semibold tracking-[0.16em] text-black/55">
         <Link href="/">TIENDA</Link>

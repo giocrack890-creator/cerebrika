@@ -1,5 +1,6 @@
 import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
-import { resolvePriceArs, type Product } from "@/content/products";
+import type { Product } from "@/content/products";
+import { chargedUnitPrices, quoteCart } from "@/lib/cart-math";
 import { getSiteUrl, isHttpsUrl, prefersSandboxCheckout, requireEnv } from "@/lib/env";
 import type { FetchedPayment } from "@/lib/payments/types";
 
@@ -31,6 +32,8 @@ export function mapPayment(payment: PaymentLike): FetchedPayment {
     email: payerEmail ?? metadataEmail,
     externalReference: payment.external_reference ?? null,
     productId: metadataProduct,
+    productSlugs: readString(payment.metadata, "product_slugs"),
+    coupon: readString(payment.metadata, "coupon"),
   };
 }
 
@@ -39,34 +42,44 @@ export function paymentMatchesProduct(payment: FetchedPayment, productId: string
   return Boolean(payment.externalReference?.startsWith(`${productId}:`));
 }
 
-export async function createCheckoutPreference(buyerEmail: string, product: Product): Promise<string> {
+export async function createCheckoutPreference(
+  buyerEmail: string,
+  productOrList: Product | readonly Product[],
+  couponCode?: string,
+): Promise<string> {
   const accessToken = requireEnv("MERCADOPAGO_ACCESS_TOKEN");
-  const price = resolvePriceArs(product);
-  if (!price || !Number.isSafeInteger(price) || price <= 0) {
-    throw new Error("PRICE_ARS tiene que ser un entero mayor a cero.");
+  const list = Array.isArray(productOrList) ? productOrList : [productOrList];
+  const quote = quoteCart(
+    list.map((product) => product.slug),
+    couponCode,
+  );
+  if (!quote.ok) {
+    throw new Error(quote.error === "missing_price" ? "PRICE_ARS tiene que ser un entero mayor a cero." : "El carrito no se puede cobrar.");
   }
+  const charged = chargedUnitPrices(quote.lines, quote.total);
 
   const siteUrl = getSiteUrl();
   const https = isHttpsUrl(siteUrl);
   const client = new MercadoPagoConfig({ accessToken });
   const preference = await new Preference(client).create({
     body: {
-      items: [
-        {
-          id: product.slug,
-          title: product.title,
-          description: "Ebook en PDF. Entrega por email.",
-          quantity: 1,
-          unit_price: price,
-          currency_id: "ARS",
-        },
-      ],
+      items: quote.lines.map((line, index) => ({
+        id: line.slug,
+        title: line.title,
+        description: "Ebook en PDF. Entrega por email.",
+        quantity: 1,
+        unit_price: charged[index],
+        currency_id: "ARS",
+      })),
       payer: { email: buyerEmail },
-      external_reference: `${product.slug}:${crypto.randomUUID()}`,
+      external_reference: `cart:${crypto.randomUUID()}`,
       metadata: {
-        product_id: product.slug,
-        product_slug: product.slug,
+        product_id: quote.lines[0]?.slug ?? "",
+        product_slug: quote.lines[0]?.slug ?? "",
+        product_slugs: quote.lines.map((line) => line.slug).join(","),
         buyer_email: buyerEmail,
+        coupon: quote.coupon ?? "",
+        expected_total: String(quote.total),
       },
       binary_mode: true,
       statement_descriptor: "CEREBRIKA",

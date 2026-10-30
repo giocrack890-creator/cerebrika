@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { CartProvider } from "@/components/store/cart-provider";
 import { storeConfig } from "@/content/products";
 import { site } from "@/content/site";
 import { getWhatsappNumber } from "@/lib/env";
@@ -47,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {announcement ? (
           <p className="bg-black px-4 py-2 text-center text-[11px] font-semibold tracking-[0.14em] text-white">{announcement}</p>
         ) : null}
-        {children}
+        <CartProvider>{children}</CartProvider>
         {whatsapp ? (
           <a
             href={`https://wa.me/${whatsapp}`}

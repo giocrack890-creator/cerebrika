@@ -20,6 +20,7 @@ export function createDeliveryDeps(productTitle: string): DeliveryDeps {
 }
 
 export function deliverWithLiveDeps(payment: NormalizedApprovedPayment) {
-  const product = getProduct(payment.productId);
-  return deliverDigitalOrder(payment, createDeliveryDeps(product?.title ?? payment.productId));
+  const product = getProduct(payment.items?.[0]?.slug ?? payment.productId);
+  const title = payment.items?.[0]?.title ?? product?.title ?? payment.productId;
+  return deliverDigitalOrder(payment, createDeliveryDeps(title));
 }

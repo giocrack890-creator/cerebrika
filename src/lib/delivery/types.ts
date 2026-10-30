@@ -38,6 +38,12 @@ export interface OrderStore {
   claimEmailSend(id: string, now: Date): Promise<boolean>;
   markEmailSent(id: string, now: Date): Promise<void>;
   releaseEmailClaim(id: string): Promise<void>;
+  saveItems?(
+    orderId: string,
+    items: { slug: string; title: string; unitPrice: number; downloadToken: string; downloadExpiresAt: string }[],
+  ): Promise<void>;
+  listDownloadsByEmail?(email: string): Promise<{ title: string; slug: string; downloadToken: string; downloadExpiresAt: string }[]>;
+  extendDownloads?(email: string, expiresAt: string): Promise<void>;
 }
 
 export interface Mailer {

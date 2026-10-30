@@ -37,23 +37,29 @@ export function deliveryEmail(input: {
   productTitle: string;
   downloadUrl: string;
   expiresAt: string;
+  items?: readonly { title: string; downloadUrl: string }[];
 }): { subject: string; html: string; text: string } {
   const when = formatBuenosAires(new Date(input.expiresAt));
-  const url = escapeHtml(input.downloadUrl);
-  const subject = `Tu ebook: ${input.productTitle}`;
+  const items = input.items?.length ? input.items : [{ title: input.productTitle, downloadUrl: input.downloadUrl }];
+  const subject = items.length > 1 ? "Tus ebooks de Cerebrika" : `Tu ebook: ${items[0]?.title ?? input.productTitle}`;
+  const blocks = items
+    .map(
+      (item) =>
+        `<h2 style="margin:20px 0 8px;font-size:16px;">${escapeHtml(item.title)}</h2><p style="margin:0 0 8px;"><a href="${escapeHtml(item.downloadUrl)}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;border-radius:999px;padding:12px 18px;font-size:12px;letter-spacing:0.14em;font-weight:700;">DESCARGAR PDF</a></p><p style="margin:0;font-size:14px;line-height:1.5;word-break:break-all;"><a href="${escapeHtml(item.downloadUrl)}">${escapeHtml(item.downloadUrl)}</a></p>`,
+    )
+    .join("");
   const html = shell(
-    "Ya podés descargar el PDF",
-    `<p style="margin:0 0 16px;font-size:16px;line-height:1.5;">El pago quedó aprobado. Este enlace es personal y vence el ${escapeHtml(when)} (hora de Buenos Aires).</p>
-     <p style="margin:0 0 20px;"><a href="${url}" style="display:inline-block;background:#111;color:#fff;text-decoration:none;border-radius:999px;padding:12px 18px;font-size:12px;letter-spacing:0.14em;font-weight:700;">DESCARGAR PDF</a></p>
-     <p style="margin:0;font-size:14px;line-height:1.5;word-break:break-all;"><a href="${url}">${url}</a></p>
-     <p style="margin:16px 0 0;font-size:14px;line-height:1.5;">Si el archivo dice que es un marcador de posición, el texto final todavía no estaba publicado al momento de la compra.</p>`,
+    "Ya podés descargar",
+    `<p style="margin:0 0 16px;font-size:16px;line-height:1.5;">El pago quedó aprobado. Cada enlace es personal y vence el ${escapeHtml(when)} (hora de Buenos Aires).</p>${blocks}<p style="margin:16px 0 0;font-size:14px;line-height:1.5;">Si el archivo dice que es un marcador de posición, el texto final todavía no estaba publicado al momento de la compra.</p>`,
   );
-  const text = `${subject}
-
-El pago quedó aprobado. Descargá el PDF (vence el ${when}, hora de Buenos Aires):
-${input.downloadUrl}
-
-Si el archivo dice que es un marcador de posición, el texto final todavía no estaba publicado.`;
+  const text = [
+    subject,
+    "",
+    `El pago quedó aprobado. Cada enlace vence el ${when}, hora de Buenos Aires.`,
+    "",
+    ...items.flatMap((item) => [item.title, item.downloadUrl, ""]),
+    "Si el archivo dice que es un marcador de posición, el texto final todavía no estaba publicado.",
+  ].join("\n");
   return { subject, html, text };
 }
 

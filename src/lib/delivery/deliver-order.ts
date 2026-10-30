@@ -44,11 +44,27 @@ export async function deliverDigitalOrder(
     throw new Error("delivery_in_progress");
   }
 
-  const downloadUrl = `${deps.siteUrl}/descarga/${order.downloadToken}`;
+  const lines = payment.items?.length
+    ? payment.items
+    : [{ slug: payment.productId, title: deps.productTitle, unitPrice: payment.amount }];
+  const saved = lines.map((line, index) => ({
+    slug: line.slug,
+    title: line.title,
+    unitPrice: line.unitPrice,
+    downloadToken: index === 0 ? order.downloadToken : deps.createToken(),
+    downloadExpiresAt: order.downloadExpiresAt,
+  }));
+  if (deps.store.saveItems) {
+    await deps.store.saveItems(order.id, saved);
+  }
   const message = deliveryEmail({
     productTitle: deps.productTitle,
-    downloadUrl,
+    downloadUrl: `${deps.siteUrl}/descarga/${order.downloadToken}`,
     expiresAt: order.downloadExpiresAt,
+    items: saved.map((line) => ({
+      title: line.title,
+      downloadUrl: `${deps.siteUrl}/descarga/${line.downloadToken}`,
+    })),
   });
 
   try {
