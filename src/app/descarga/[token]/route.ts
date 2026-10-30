@@ -15,7 +15,7 @@ function htmlPage(title: string, body: string, status: number): Response {
   </head>
   <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#F5F2EB;color:#111;font-family:Inter,Arial,sans-serif;padding:24px;">
     <main style="max-width:520px;background:#fff;border-radius:32px;padding:40px;">
-      <p style="letter-spacing:0.16em;font-size:12px;font-weight:700;">IA PARA DOCENTES</p>
+      <p style="letter-spacing:0.16em;font-size:12px;font-weight:700;">${site.brand.name.toUpperCase()}</p>
       <h1 style="font-size:36px;letter-spacing:-0.04em;line-height:1;">${title}</h1>
       <p style="font-size:18px;line-height:1.5;">${body}</p>
       <p><a href="/" style="color:#111;">Volver al inicio</a></p>

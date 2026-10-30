@@ -1,4 +1,5 @@
 import { promptsIntro, type Prompt } from "@/content/prompts";
+import { site } from "@/content/site";
 import { formatBuenosAires } from "@/lib/format";
 
 function escapeHtml(value: string): string {
@@ -19,7 +20,7 @@ function shell(title: string, body: string): string {
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border-radius:28px;padding:32px;">
             <tr>
               <td>
-                <p style="margin:0 0 12px;font-size:12px;letter-spacing:0.16em;font-weight:700;">IA PARA DOCENTES</p>
+                <p style="margin:0 0 12px;font-size:12px;letter-spacing:0.16em;font-weight:700;">${escapeHtml(site.brand.name.toUpperCase())}</p>
                 <h1 style="margin:0 0 16px;font-size:28px;line-height:1.1;letter-spacing:-0.04em;">${escapeHtml(title)}</h1>
                 ${body}
               </td>

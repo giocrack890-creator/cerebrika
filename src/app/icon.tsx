@@ -19,12 +19,14 @@ export default function Icon() {
       >
         <div
           style={{
-            width: "18px",
-            height: "18px",
-            borderRadius: "9px",
-            background: "#EA580C",
+            color: "#F5F2EB",
+            fontSize: 18,
+            fontWeight: 700,
+            letterSpacing: "-0.06em",
           }}
-        />
+        >
+          C
+        </div>
       </div>
     ),
     { ...size },

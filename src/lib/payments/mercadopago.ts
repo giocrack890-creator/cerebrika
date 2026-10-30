@@ -68,7 +68,7 @@ export async function createCheckoutPreference(buyerEmail: string): Promise<stri
         buyer_email: buyerEmail,
       },
       binary_mode: true,
-      statement_descriptor: "IA DOCENTES",
+      statement_descriptor: "CEREBRIKA",
       back_urls: {
         success: `${siteUrl}/pago/exito`,
         failure: `${siteUrl}/pago/error`,

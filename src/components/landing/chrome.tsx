@@ -35,10 +35,11 @@ function LogoMark() {
   return (
     <svg viewBox="0 0 64 64" className="h-12 w-12" aria-hidden="true">
       <circle cx="32" cy="32" r="32" fill="#111111" />
-      <path d="M32 32 L32 10 A22 22 0 0 1 54 32 Z" fill="#3730A3" />
-      <path d="M32 32 L54 32 A22 22 0 0 1 32 54 Z" fill="#EA580C" />
-      <path d="M32 32 L32 54 A22 22 0 0 1 10 32 Z" fill="#DC2626" />
-      <path d="M32 32 L10 32 A22 22 0 0 1 32 10 Z" fill="#6B4F3B" />
+      <g fill="none" stroke="#F5F2EB" strokeWidth="2.4" strokeLinecap="round">
+        <path d="M32 17c-6.2 0-10.4 4.4-10.4 9.6 0 1.7.4 3.2 1.2 4.5-1.7 1.2-2.8 3.2-2.8 5.4 0 3.7 2.9 6.7 6.6 6.7 1.1 2.5 3.4 4.2 6.2 4.2" />
+        <path d="M32 17c6.2 0 10.4 4.4 10.4 9.6 0 1.7-.4 3.2-1.2 4.5 1.7 1.2 2.8 3.2 2.8 5.4 0 3.7-2.9 6.7-6.6 6.7-1.1 2.5-3.4 4.2-6.2 4.2" />
+        <path d="M25.5 28.5H32M32 36h6.5" />
+      </g>
     </svg>
   );
 }

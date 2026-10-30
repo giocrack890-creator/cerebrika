@@ -31,9 +31,10 @@ function drawPage(title, lines) {
   });
 }
 
-drawPage("IA para docentes", [
+drawPage("Cerebrika", [
   "Este PDF es un marcador de posicion.",
-  "El ebook todavia no esta escrito.",
+  "Cerebrika vende ebooks cortos de IA.",
+  "El primero, IA para docentes, todavia no esta escrito.",
   "No es el material final y no incluye el metodo.",
   "",
   "Cuando el texto este listo, reemplaza este archivo",

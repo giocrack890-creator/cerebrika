@@ -30,6 +30,12 @@ export type StackCard = {
  * Precio, mails y claves no: eso sale de las variables de entorno.
  */
 export const site = {
+  brand: {
+    name: "Cerebrika",
+    tagline: "Ebooks cortos de IA",
+    description:
+      "Cerebrika es una tienda de ebooks cortos para usar IA en un trabajo concreto. El primero es para docentes: planificá tu semana en 1 hora.",
+  },
   product: {
     id: "ia-para-docentes",
     name: "IA para docentes",
@@ -44,16 +50,16 @@ export const site = {
   placeholderNotice:
     "El PDF final todavía no está publicado. Si comprás ahora, la descarga es un marcador de posición, no el libro.",
   hero: {
-    kicker: "IA para docentes",
+    kicker: "Cerebrika · para docentes",
     title: "Planificá tu semana en 1 hora",
     subtitle:
-      "Un ebook corto, en castellano rioplatense, para docentes de Latinoamérica que todavía no saben cómo usar la IA. Sin jerga y sin instalar nada.",
+      "El primer ebook de Cerebrika. Corto, en castellano rioplatense, para docentes de Latinoamérica que todavía no saben cómo usar la IA. Sin jerga y sin instalar nada.",
   },
   chrome: {
     buy: "COMPRAR",
     bar: "Planificá tu semana en 1 hora con IA",
     barButton: "COMPRAR AHORA →",
-    brand: "IA para docentes",
+    brand: "Cerebrika",
     clockLabel: "Buenos Aires",
     nav: [
       { href: "#inicio", id: "inicio", label: "Inicio", icon: "home" },
@@ -267,7 +273,7 @@ export const site = {
     },
   ],
   footer: {
-    line: "Ebook en PDF · pago único por Mercado Pago",
+    line: "Tienda de ebooks cortos de IA. Este es el primero: para docentes. Pago único por Mercado Pago.",
     seller: "[PLACEHOLDER: nombre o razón social de quien vende]",
     contact: "[PLACEHOLDER: email de soporte]",
     tax: "[PLACEHOLDER: CUIT u otros datos fiscales]",

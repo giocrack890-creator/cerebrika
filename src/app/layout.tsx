@@ -20,13 +20,17 @@ function metadataBase(): URL | undefined {
 
 const base = metadataBase();
 
+const pageTitle = `${site.brand.name} · ${site.product.title}`;
+
 export const metadata: Metadata = {
-  title: site.product.title,
-  description: site.hero.subtitle,
+  title: pageTitle,
+  description: site.brand.description,
+  applicationName: site.brand.name,
   ...(base ? { metadataBase: base } : {}),
   openGraph: {
-    title: site.product.title,
-    description: site.hero.subtitle,
+    title: pageTitle,
+    description: site.brand.description,
+    siteName: site.brand.name,
     locale: "es_AR",
     type: "website",
   },

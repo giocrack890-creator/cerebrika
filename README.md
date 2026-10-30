@@ -1,6 +1,6 @@
-# IA para docentes
+# Cerebrika
 
-Landing para vender el ebook **IA para docentes: planificá tu semana en 1 hora**. El pago entra por Mercado Pago Checkout Pro. Si el pago queda aprobado, un webhook verifica la firma, guarda el pedido en Supabase y manda por Resend un enlace de descarga que vence.
+Tienda de ebooks cortos de IA. El primero es **IA para docentes: planificá tu semana en 1 hora**. El pago entra por Mercado Pago Checkout Pro. Si el pago queda aprobado, un webhook verifica la firma, guarda el pedido en Supabase y manda por Resend un enlace de descarga que vence. El remitente visible de esos mails es Cerebrika.
 
 Los textos de la página están en [`src/content/site.ts`](src/content/site.ts). Los diez prompts gratis están en [`src/content/prompts.ts`](src/content/prompts.ts).
 
@@ -38,7 +38,7 @@ cp .env.example .env.local
 | `SUPABASE_SERVICE_ROLE_KEY` | Project Settings → API → `service_role` (solo servidor) |
 | `EBOOK_STORAGE_BUCKET` / `EBOOK_STORAGE_PATH` | Vacío hasta que subas el PDF real |
 | `RESEND_API_KEY` | Resend → API Keys |
-| `EMAIL_FROM` | Un remitente del dominio verificado, por ejemplo `IA para docentes <hola@tudominio.com>` |
+| `EMAIL_FROM` | Un remitente del dominio verificado, por ejemplo `Cerebrika <hola@tudominio.com>`. El nombre visible se fuerza a Cerebrika |
 | `SITE_URL` | URL pública, sin barra final |
 | `PRICE_ARS` | Entero en pesos |
 | `DOWNLOAD_TTL_HOURS` | Validez del enlace del mail. Por defecto 72 |
