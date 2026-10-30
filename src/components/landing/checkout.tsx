@@ -1,0 +1,158 @@
+"use client";
+
+import { createContext, useContext, useEffect, useId, useRef, useState } from "react";
+import { site } from "@/content/site";
+
+type CheckoutContextValue = {
+  openCheckout: () => void;
+};
+
+const CheckoutContext = createContext<CheckoutContextValue | null>(null);
+
+export function useCheckout(): CheckoutContextValue {
+  const value = useContext(CheckoutContext);
+  if (!value) {
+    throw new Error("Falta CheckoutProvider.");
+  }
+  return value;
+}
+
+const blackPill =
+  "inline-flex items-center justify-center rounded-full bg-black px-5 py-3 text-[11px] font-semibold tracking-[0.16em] text-white transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+
+export function CheckoutProvider({
+  children,
+  priceLabel,
+}: {
+  children: React.ReactNode;
+  priceLabel: string | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+
+  function openCheckout() {
+    setError(null);
+    setOpen(true);
+  }
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!priceLabel) {
+      setError(site.checkout.missingPrice);
+      return;
+    }
+    const form = new FormData(event.currentTarget);
+    setPending(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: String(form.get("email") ?? ""),
+          company: String(form.get("company") ?? ""),
+        }),
+      });
+      const data = (await response.json().catch(() => null)) as { error?: string; initPoint?: string } | null;
+      if (!response.ok || !data?.initPoint) {
+        setError(data?.error ?? site.checkout.genericError);
+        setPending(false);
+        return;
+      }
+      window.location.assign(data.initPoint);
+    } catch {
+      setError(site.checkout.genericError);
+      setPending(false);
+    }
+  }
+
+  return (
+    <CheckoutContext.Provider value={{ openCheckout }}>
+      {children}
+      <dialog
+        ref={dialogRef}
+        className="checkout-dialog"
+        aria-labelledby={titleId}
+        onClose={() => {
+          setOpen(false);
+          setPending(false);
+        }}
+      >
+          <form
+          onSubmit={onSubmit}
+          className="relative w-full max-w-[440px] rounded-[32px] bg-white p-8 text-[#111111] shadow-[0_30px_80px_rgba(0,0,0,0.18)]"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <h2 id={titleId} className="text-3xl font-bold tracking-[-0.045em]">
+              {site.checkout.title}
+            </h2>
+            <button
+              type="button"
+              className="shrink-0 rounded-full px-3 py-2 text-xs font-semibold tracking-[0.14em]"
+              onClick={() => dialogRef.current?.close()}
+            >
+              {site.checkout.close}
+            </button>
+          </div>
+          <p className="mt-3 text-base leading-relaxed text-black/70">{site.checkout.body}</p>
+          <p className="mt-5 text-sm font-semibold tracking-tight">
+            {site.checkout.priceLabel}
+            {priceLabel ? ` · ${priceLabel}` : ""}
+          </p>
+          <label className="mt-5 block text-sm font-medium" htmlFor="checkout-email">
+            {site.checkout.emailLabel}
+          </label>
+          <input
+            id="checkout-email"
+            name="email"
+            type="email"
+            required
+            autoComplete="email"
+            placeholder={site.checkout.emailPlaceholder}
+            className="mt-2 w-full rounded-full border border-black/10 bg-[#F5F2EB] px-5 py-3 text-base outline-none"
+          />
+          <div className="absolute left-[-9999px] h-0 overflow-hidden" aria-hidden="true">
+            <label>
+              Empresa
+              <input name="company" tabIndex={-1} autoComplete="off" />
+            </label>
+          </div>
+          {error ? (
+            <p role="alert" className="mt-4 text-sm text-[#DC2626]">
+              {error}
+            </p>
+          ) : null}
+          <button type="submit" className={`${blackPill} mt-6 w-full`} disabled={pending || !priceLabel}>
+            {pending ? site.checkout.submitting : site.checkout.submit}
+          </button>
+          {!priceLabel ? <p className="mt-3 text-sm text-black/60">{site.checkout.missingPrice}</p> : null}
+        </form>
+      </dialog>
+    </CheckoutContext.Provider>
+  );
+}
+
+export function BuyButton({
+  label,
+  className,
+}: {
+  label: string;
+  className: string;
+}) {
+  const { openCheckout } = useCheckout();
+  return (
+    <button type="button" className={className} onClick={openCheckout}>
+      {label}
+    </button>
+  );
+}
