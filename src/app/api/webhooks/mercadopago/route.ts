@@ -1,4 +1,4 @@
-import { site } from "@/content/site";
+import { resolvePaidProduct } from "@/content/products";
 import { deliverWithLiveDeps } from "@/lib/delivery/live";
 import { fetchMercadoPagoPayment } from "@/lib/payments/mercadopago";
 import { handleMercadoPagoWebhook } from "@/lib/payments/process-mercadopago-notification";
@@ -7,7 +7,11 @@ export async function POST(request: Request) {
   try {
     const result = await handleMercadoPagoWebhook(request, {
       webhookSecret: process.env.MERCADOPAGO_WEBHOOK_SECRET?.trim() ?? "",
-      productId: site.product.id,
+      acceptProduct: (payment) => {
+        const product = resolvePaidProduct(payment);
+        if (!product) return null;
+        return { productId: product.slug, productTitle: product.title };
+      },
       getPayment: fetchMercadoPagoPayment,
       deliver: deliverWithLiveDeps,
     });

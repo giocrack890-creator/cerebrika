@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { site } from "@/content/site";
+import { getProduct } from "@/content/products";
 import { deliverDigitalOrder } from "@/lib/delivery/deliver-order";
 import type { DeliveryDeps } from "@/lib/delivery/types";
 import { createResendMailer } from "@/lib/email/resend-mailer";
@@ -7,12 +7,12 @@ import { getDownloadTtlHours, getSiteUrl } from "@/lib/env";
 import type { NormalizedApprovedPayment } from "@/lib/payments/types";
 import { createSupabaseOrderStore } from "@/lib/supabase/order-store";
 
-export function createDeliveryDeps(): DeliveryDeps {
+export function createDeliveryDeps(productTitle: string): DeliveryDeps {
   return {
     store: createSupabaseOrderStore(),
     mailer: createResendMailer(),
     siteUrl: getSiteUrl(),
-    productTitle: site.product.title,
+    productTitle,
     ttlHours: getDownloadTtlHours(),
     now: () => new Date(),
     createToken: () => randomBytes(32).toString("base64url"),
@@ -20,5 +20,6 @@ export function createDeliveryDeps(): DeliveryDeps {
 }
 
 export function deliverWithLiveDeps(payment: NormalizedApprovedPayment) {
-  return deliverDigitalOrder(payment, createDeliveryDeps());
+  const product = getProduct(payment.productId);
+  return deliverDigitalOrder(payment, createDeliveryDeps(product?.title ?? payment.productId));
 }

@@ -9,6 +9,7 @@ type OrderRow = {
   provider: string;
   provider_payment_id: string;
   product_id: string;
+  product_slug?: string | null;
   email: string;
   amount: number | string;
   currency: string;
@@ -26,6 +27,7 @@ function mapRow(row: OrderRow): OrderRecord {
     provider,
     providerPaymentId: row.provider_payment_id,
     productId: row.product_id,
+    productSlug: row.product_slug || row.product_id,
     email: row.email,
     amount: Number(row.amount),
     currency: row.currency,
@@ -48,6 +50,7 @@ export function createSupabaseOrderStore(): OrderStore {
           provider: input.provider,
           provider_payment_id: input.providerPaymentId,
           product_id: input.productId,
+          product_slug: input.productSlug,
           status: "approved",
           email: input.email,
           amount: input.amount,

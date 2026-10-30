@@ -10,7 +10,7 @@ export type NotificationResult = {
 
 export type MercadoPagoHandlerDeps = {
   webhookSecret: string;
-  productId: string;
+  acceptProduct: (payment: FetchedPayment) => { productId: string; productTitle: string } | null;
   getPayment: (id: string) => Promise<FetchedPayment>;
   deliver: (payment: NormalizedApprovedPayment) => Promise<DeliverResult>;
 };
@@ -93,7 +93,8 @@ export async function handleMercadoPagoWebhook(
     };
   }
 
-  if (!paymentMatchesProduct(payment, deps.productId)) {
+  const accepted = deps.acceptProduct(payment);
+  if (!accepted || !paymentMatchesProduct(payment, accepted.productId)) {
     console.error("webhook_mercadopago_unrelated", payment.id);
     return { status: 200, body: { ok: true, action: "ignored", reason: "unrelated_product" } };
   }
@@ -108,7 +109,7 @@ export async function handleMercadoPagoWebhook(
     email: payment.email,
     amount: payment.amount,
     currency: payment.currency,
-    productId: deps.productId,
+    productId: accepted.productId,
     metadata: { source: "mercadopago" },
   });
 

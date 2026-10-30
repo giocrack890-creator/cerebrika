@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { site } from "@/content/site";
 import "./globals.css";
 
-const inter = Inter({
+const fraunces = Fraunces({
   subsets: ["latin"],
   display: "swap",
+  variable: "--font-fraunces",
+});
+
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-source",
 });
 
 function metadataBase(): URL | undefined {
@@ -20,7 +27,7 @@ function metadataBase(): URL | undefined {
 
 const base = metadataBase();
 
-const pageTitle = `${site.brand.name} · ${site.product.title}`;
+const pageTitle = `${site.brand.name} · Ebooks de IA`;
 
 export const metadata: Metadata = {
   title: pageTitle,
@@ -38,8 +45,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-AR" className={`${inter.className} h-full antialiased`}>
-      <body className="min-h-full bg-[#F5F2EB] text-[#111111]">{children}</body>
+    <html lang="es-AR" className={`${fraunces.variable} ${sourceSans.variable} h-full antialiased`}>
+      <body className="min-h-full bg-[#F3EEE6] font-sans text-[#1C1714]">{children}</body>
     </html>
   );
 }

@@ -1,4 +1,4 @@
-import { getPriceArs } from "@/lib/env";
+import { getProduct, resolvePriceArs } from "@/content/products";
 import { jsonError, jsonOk, parseContactForm } from "@/lib/forms";
 import { createCheckoutPreference } from "@/lib/payments/mercadopago";
 
@@ -7,12 +7,16 @@ export async function POST(request: Request) {
   if (!form.ok) return jsonError(form.error, 400);
   if (form.honeypot) return jsonError("No pudimos abrir el pago.", 400);
 
-  if (!getPriceArs()) {
+  const product = form.slug ? getProduct(form.slug) : undefined;
+  if (!product || product.status !== "available") {
+    return jsonError("Ese ebook no está a la venta.", 400);
+  }
+  if (!resolvePriceArs(product)) {
     return jsonError("El precio no está configurado.", 503);
   }
 
   try {
-    const initPoint = await createCheckoutPreference(form.email);
+    const initPoint = await createCheckoutPreference(form.email, product);
     return jsonOk({ initPoint });
   } catch (error) {
     console.error("checkout_failed", error instanceof Error ? error.message : "unknown");

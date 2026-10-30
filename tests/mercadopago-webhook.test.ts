@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
 import { deliverDigitalOrder } from "@/lib/delivery/deliver-order";
 import type { Mailer, NewOrderInput, OrderRecord, OrderStore } from "@/lib/delivery/types";
+import { paymentMatchesProduct } from "@/lib/payments/mercadopago";
 import { handleMercadoPagoWebhook } from "@/lib/payments/process-mercadopago-notification";
 import type { FetchedPayment } from "@/lib/payments/types";
 
@@ -46,6 +47,7 @@ class MemoryOrderStore implements OrderStore {
       provider: input.provider,
       providerPaymentId: input.providerPaymentId,
       productId: input.productId,
+      productSlug: input.productSlug,
       email: input.email,
       amount: input.amount,
       currency: input.currency,
@@ -112,7 +114,10 @@ function harness(status: string) {
   const getPayment = vi.fn(async (id: string) => payment(status, id));
   const deps = {
     webhookSecret: SECRET,
-    productId: PRODUCT_ID,
+    acceptProduct: (fetched: FetchedPayment) =>
+      paymentMatchesProduct(fetched, PRODUCT_ID)
+        ? { productId: PRODUCT_ID, productTitle: "IA para docentes" }
+        : null,
     getPayment,
     deliver: (approved: Parameters<typeof deliverDigitalOrder>[0]) =>
       deliverDigitalOrder(approved, {

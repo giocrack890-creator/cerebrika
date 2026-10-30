@@ -1,5 +1,5 @@
 import { MercadoPagoConfig, Payment, Preference } from "mercadopago";
-import { site } from "@/content/site";
+import { resolvePriceArs, type Product } from "@/content/products";
 import { getSiteUrl, isHttpsUrl, prefersSandboxCheckout, requireEnv } from "@/lib/env";
 import type { FetchedPayment } from "@/lib/payments/types";
 
@@ -39,10 +39,10 @@ export function paymentMatchesProduct(payment: FetchedPayment, productId: string
   return Boolean(payment.externalReference?.startsWith(`${productId}:`));
 }
 
-export async function createCheckoutPreference(buyerEmail: string): Promise<string> {
+export async function createCheckoutPreference(buyerEmail: string, product: Product): Promise<string> {
   const accessToken = requireEnv("MERCADOPAGO_ACCESS_TOKEN");
-  const price = Number(requireEnv("PRICE_ARS"));
-  if (!Number.isSafeInteger(price) || price <= 0) {
+  const price = resolvePriceArs(product);
+  if (!price || !Number.isSafeInteger(price) || price <= 0) {
     throw new Error("PRICE_ARS tiene que ser un entero mayor a cero.");
   }
 
@@ -53,8 +53,8 @@ export async function createCheckoutPreference(buyerEmail: string): Promise<stri
     body: {
       items: [
         {
-          id: site.product.id,
-          title: site.product.title,
+          id: product.slug,
+          title: product.title,
           description: "Ebook en PDF. Entrega por email.",
           quantity: 1,
           unit_price: price,
@@ -62,9 +62,10 @@ export async function createCheckoutPreference(buyerEmail: string): Promise<stri
         },
       ],
       payer: { email: buyerEmail },
-      external_reference: `${site.product.id}:${crypto.randomUUID()}`,
+      external_reference: `${product.slug}:${crypto.randomUUID()}`,
       metadata: {
-        product_id: site.product.id,
+        product_id: product.slug,
+        product_slug: product.slug,
         buyer_email: buyerEmail,
       },
       binary_mode: true,

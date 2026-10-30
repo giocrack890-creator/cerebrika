@@ -3,10 +3,12 @@ import { z } from "zod";
 const requestSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email()),
   company: z.string().optional(),
+  slug: z.string().trim().min(1).max(80).optional(),
+  source: z.string().trim().min(1).max(80).optional(),
 });
 
 export type ParsedForm =
-  | { ok: true; email: string; honeypot: boolean }
+  | { ok: true; email: string; honeypot: boolean; slug?: string; source?: string }
   | { ok: false; error: string };
 
 export async function parseContactForm(request: Request): Promise<ParsedForm> {
@@ -26,6 +28,8 @@ export async function parseContactForm(request: Request): Promise<ParsedForm> {
     ok: true,
     email: parsed.data.email,
     honeypot: Boolean(parsed.data.company?.trim()),
+    slug: parsed.data.slug,
+    source: parsed.data.source,
   };
 }
 

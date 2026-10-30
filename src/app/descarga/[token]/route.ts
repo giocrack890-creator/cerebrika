@@ -1,7 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { FLAGSHIP_SLUG, getProduct } from "@/content/products";
 import { site } from "@/content/site";
-import { getEbookStorage } from "@/lib/env";
+import { resolveProductStorage } from "@/lib/storage";
 import { getServiceClient } from "@/lib/supabase/admin";
 import { createSupabaseOrderStore } from "@/lib/supabase/order-store";
 
@@ -46,16 +47,22 @@ export async function GET(
       return htmlPage(site.download.expiredTitle, site.download.expiredBody, 410);
     }
 
-    const storage = getEbookStorage();
+    const product = getProduct(order.productSlug || order.productId) ?? null;
+    const storage = resolveProductStorage(product);
+    const fileName = product?.fileName ?? "ebook.pdf";
     if (storage) {
       const signed = await getServiceClient()
         .storage.from(storage.bucket)
-        .createSignedUrl(storage.path, 120, { download: site.product.fileName });
+        .createSignedUrl(storage.path, 120, { download: fileName });
       if (signed.error || !signed.data?.signedUrl) {
         console.error("download_storage_failed", signed.error?.message ?? "missing_url");
         return htmlPage(site.download.missingFileTitle, site.download.missingFileBody, 502);
       }
       return Response.redirect(signed.data.signedUrl, 302);
+    }
+
+    if (!product || product.slug !== FLAGSHIP_SLUG) {
+      return htmlPage(site.download.missingFileTitle, site.download.missingFileBody, 404);
     }
 
     const bytes = await readFile(path.join(process.cwd(), "private/ebook/placeholder.pdf"));

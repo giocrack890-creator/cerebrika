@@ -7,6 +7,7 @@ export type OrderRecord = {
   provider: NormalizedApprovedPayment["provider"];
   providerPaymentId: string;
   productId: string;
+  productSlug: string;
   email: string;
   amount: number;
   currency: string;
@@ -21,6 +22,7 @@ export type NewOrderInput = {
   provider: NormalizedApprovedPayment["provider"];
   providerPaymentId: string;
   productId: string;
+  productSlug: string;
   email: string;
   amount: number;
   currency: string;

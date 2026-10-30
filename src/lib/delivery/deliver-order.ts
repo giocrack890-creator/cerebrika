@@ -22,6 +22,7 @@ export async function deliverDigitalOrder(
     provider: payment.provider,
     providerPaymentId: payment.providerPaymentId,
     productId: payment.productId,
+    productSlug: payment.productId,
     email,
     amount: payment.amount,
     currency: payment.currency.toUpperCase(),
