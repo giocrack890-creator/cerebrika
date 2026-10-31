@@ -51,31 +51,52 @@ export const site = {
       "Una lista corta para revisar lo que escribió la IA antes de usarlo.",
     ],
   },
-  included: {
-    kicker: "Qué te llevás",
-    title: "Lo justo para tu próxima semana.",
-    items: [
-      {
-        id: "capitulos",
-        title: "Ocho capítulos cortos",
-        body: "Desde para qué sirve la IA en el aula hasta la rutina de una hora para bajar la semana.",
-      },
-      {
-        id: "pedidos",
-        title: "Pedidos para copiar",
-        body: "Frases en castellano para pedir una clase, una rúbrica o un inicio de diez minutos.",
-      },
-      {
-        id: "revision",
-        title: "La revisión antes del aula",
-        body: "Qué chequear en lo que escribió la IA: datos, tono y si la actividad entra en tu hora.",
-      },
-      {
-        id: "cero",
-        title: "Sirve si arrancás de cero",
-        body: "No hace falta haber usado un chat de IA ni instalar programas.",
-      },
+  /**
+   * Historia de quién escribe y por qué. No se muestra hasta que ready sea true
+   * y el texto sea real: no inventamos una historia.
+   */
+  story: {
+    ready: false,
+    kicker: "Por qué existe",
+    title: "[PLACEHOLDER] Título de la historia",
+    paragraphs: ["[PLACEHOLDER] Contá quién escribe el ebook y por qué. Dos o tres párrafos cortos."],
+    signature: "[PLACEHOLDER] Nombre",
+  },
+  /** Los pasos salen de los capítulos del ebook. Si cambia el índice, revisá esto. */
+  method: {
+    kicker: "El método",
+    title: "Una hora, cuatro pasos.",
+    body: "El libro sigue siempre el mismo recorrido. Lo hacés una vez y después lo repetís cada semana.",
+    steps: [
+      { id: "grupo", title: "Contale tu grupo", body: "Lo que la IA no sabe: edad, materia, tiempos y recursos del aula.", chapter: "03" },
+      { id: "pedido", title: "Pedí la clase", body: "Inicio, desarrollo y cierre, con un pedido claro y en castellano.", chapter: "05" },
+      { id: "revision", title: "Revisá antes del aula", body: "Datos, tono y si la actividad entra de verdad en tu hora.", chapter: "07" },
+      { id: "semana", title: "Armá la semana", body: "Repetís el pedido para los cinco días y cerrás la planificación.", chapter: "08" },
     ],
+  },
+  compare: {
+    kicker: "Antes y después",
+    title: "La diferencia está en cómo lo pedís.",
+    body: "Un pedido vago trae una respuesta genérica. Uno con contexto trae una clase que se puede dar.",
+    vagueLabel: "Pedido vago",
+    vague: "Haceme una clase de fracciones.",
+    vagueResult: "Una clase genérica, sin edad ni tiempos, que hay que rehacer.",
+    goodLabel: "Pedido con contexto",
+    good: "Soy docente de 5º grado. Tengo 40 minutos y no hay proyector. Armame una clase de introducción a fracciones con inicio, desarrollo y cierre, y un error común que tenga que anticipar.",
+    goodResult: "Una clase con tiempos, consignas y materiales que entran en tu aula.",
+    note: "Ejemplo armado para mostrar la idea. El ebook trae los pedidos completos.",
+  },
+  offer: {
+    kicker: "Qué incluye",
+    title: "Todo lo que te llevás",
+    items: [
+      "Ebook en PDF, para leer en el celu o imprimir",
+      "Ocho capítulos cortos, del primer chat a la rutina semanal",
+      "Pedidos listos para copiar y completar",
+      "Lista para revisar lo que escribió la IA",
+      "Reenvío del enlace desde Mis compras cuando lo necesites",
+    ],
+    terms: "Pago único. Sin suscripción ni cuotas que se renueven.",
   },
   how: {
     kicker: "Cómo funciona",
@@ -193,6 +214,10 @@ export const site = {
     {
       q: "¿Y si no doy clases en Argentina?",
       a: "El método sirve para docentes de toda Latinoamérica. El texto está en castellano rioplatense y el cobro es en pesos argentinos, por Mercado Pago.",
+    },
+    {
+      q: "¿Para quién no es?",
+      a: "Si buscás aprender a programar o ya armás todo tu trabajo con IA, este ebook te va a quedar corto. Es para empezar y para ordenar la semana.",
     },
     {
       q: "¿Puedo pedir que me devuelvan el dinero?",

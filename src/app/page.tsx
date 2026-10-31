@@ -75,7 +75,7 @@ async function LiveHome() {
                   {site.hero.secondary}
                 </a>
               </div>
-              <p className="mt-3 text-[13px] text-subtle">Pago único con Mercado Pago · El PDF llega a tu mail</p>
+              <p className="mt-3 text-[13px] text-subtle">Pago único con Mercado Pago · Lo volvés a bajar cuando quieras</p>
               {placeholder ? <PlaceholderNotice className="mt-4 max-w-md" /> : null}
             </div>
             <div className="relative">
@@ -128,37 +128,120 @@ async function LiveHome() {
           </Container>
         </section>
 
-        {/* Beneficios */}
+        {/* Historia: solo con un texto real */}
+        {site.story.ready ? (
+          <section className="py-12 sm:py-24">
+            <Container>
+              <div className="reveal mx-auto max-w-2xl">
+                <p className="text-[13px] font-medium text-accent">{site.story.kicker}</p>
+                <h2 className="font-display mt-2 text-[clamp(1.9rem,6vw,2.75rem)] leading-[1.02] font-bold tracking-[-0.035em]">
+                  {site.story.title}
+                </h2>
+                <div className="mt-6 space-y-4 text-[17px] leading-relaxed text-muted">
+                  {site.story.paragraphs.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+                </div>
+                <p className="font-display mt-6 text-[18px] font-bold">{site.story.signature}</p>
+              </div>
+            </Container>
+          </section>
+        ) : null}
+
+        {/* Método */}
         <section className="bg-surface py-12 sm:py-24">
           <Container>
-            <SectionHeading kicker={site.included.kicker} title={site.included.title} />
-            <div className="mt-10 grid gap-x-8 gap-y-8 sm:grid-cols-2">
-              {site.included.items.map((item, index) => (
-                <div key={item.id} className="reveal border-t border-line pt-5">
-                  <p className="font-display text-[15px] font-bold text-accent">0{index + 1}</p>
-                  <h3 className="font-display mt-2 text-[22px] leading-tight font-bold tracking-[-0.02em]">{item.title}</h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-muted">{item.body}</p>
-                </div>
-              ))}
-            </div>
-          </Container>
-        </section>
-
-        {/* Cómo funciona */}
-        <section className="py-12 sm:py-24">
-          <Container>
-            <SectionHeading kicker={site.how.kicker} title={site.how.title} />
-            <ol className="mt-10 grid gap-3 md:grid-cols-3">
-              {site.how.steps.map((step, index) => (
-                <li key={step.id} className="reveal relative rounded-[16px] bg-surface p-5 shadow-[inset_0_0_0_1px_var(--line)] sm:p-6">
-                  <span className="font-display flex h-9 w-9 items-center justify-center rounded-full bg-ink text-[15px] font-bold text-white">
-                    {index + 1}
-                  </span>
-                  <h3 className="mt-5 text-[18px] font-semibold tracking-[-0.01em]">{step.title}</h3>
-                  <p className="mt-1.5 text-[15px] leading-relaxed text-muted">{step.body}</p>
+            <SectionHeading kicker={site.method.kicker} title={site.method.title} body={site.method.body} />
+            <ol className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {site.method.steps.map((step, index) => (
+                <li key={step.id} className="reveal flex flex-col rounded-[16px] bg-paper p-5 sm:p-6">
+                  <div className="flex items-center justify-between">
+                    <span className="font-display flex h-10 w-10 items-center justify-center rounded-full bg-accent text-[17px] font-bold text-white">
+                      {index + 1}
+                    </span>
+                    <span className="text-[12px] font-medium text-subtle">Cap. {step.chapter}</span>
+                  </div>
+                  <h3 className="font-display mt-5 text-[21px] leading-tight font-bold tracking-[-0.02em]">{step.title}</h3>
+                  <p className="mt-2 text-[15px] leading-relaxed text-muted">{step.body}</p>
                 </li>
               ))}
             </ol>
+          </Container>
+        </section>
+
+        {/* Antes y después de un pedido */}
+        <section className="py-12 sm:py-24">
+          <Container>
+            <SectionHeading kicker={site.compare.kicker} title={site.compare.title} body={site.compare.body} />
+            <div className="mt-10 grid gap-3 md:grid-cols-2">
+              <figure className="reveal rounded-[16px] p-5 shadow-[inset_0_0_0_1px_var(--line)] sm:p-6">
+                <figcaption className="flex items-center gap-2 text-[13px] font-medium text-subtle">
+                  <CloseIcon className="h-4 w-4" />
+                  {site.compare.vagueLabel}
+                </figcaption>
+                <blockquote className="mt-4 rounded-[12px] bg-surface px-4 py-3 text-[15px] text-muted shadow-[inset_0_0_0_1px_var(--line)]">
+                  {site.compare.vague}
+                </blockquote>
+                <p className="mt-4 text-[14px] leading-relaxed text-muted">{site.compare.vagueResult}</p>
+              </figure>
+              <figure className="reveal rounded-[16px] bg-surface p-5 shadow-[inset_0_0_0_2px_var(--accent)] sm:p-6">
+                <figcaption className="flex items-center gap-2 text-[13px] font-medium text-accent">
+                  <CheckIcon className="h-4 w-4" />
+                  {site.compare.goodLabel}
+                </figcaption>
+                <blockquote className="mt-4 rounded-[12px] bg-accent-soft px-4 py-3 text-[15px] leading-relaxed text-accent-ink">
+                  {site.compare.good}
+                </blockquote>
+                <p className="mt-4 text-[14px] leading-relaxed text-ink">{site.compare.goodResult}</p>
+              </figure>
+            </div>
+            <p className="mt-4 text-[13px] text-subtle">{site.compare.note}</p>
+          </Container>
+        </section>
+
+        {/* Oferta */}
+        <section id="oferta" className="scroll-mt-20 py-12 sm:py-24">
+          <Container>
+            <div className="reveal mx-auto max-w-xl overflow-hidden rounded-[24px] bg-surface shadow-[0_0_0_1px_var(--line),0_24px_48px_-24px_rgba(21,20,26,0.18)]">
+              <div className="flex items-center gap-5 bg-accent-soft px-5 py-6 sm:px-8">
+                <div className="w-16 shrink-0">
+                  <BookCover product={flagship} compact />
+                </div>
+                <div>
+                  <p className="text-[13px] font-medium text-accent">{site.offer.kicker}</p>
+                  <h2 className="font-display mt-1 text-[24px] leading-tight font-bold tracking-[-0.03em] text-accent-ink">{site.offer.title}</h2>
+                </div>
+              </div>
+              <div className="px-5 py-6 sm:px-8 sm:py-8">
+                <ul className="space-y-3">
+                  {site.offer.items.map((item) => (
+                    <li key={item} className="flex gap-3 text-[15px] leading-snug">
+                      <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6 flex items-baseline justify-between border-t border-line pt-5">
+                  <p className="text-[14px] text-muted">Precio</p>
+                  <p className="font-display text-[34px] font-bold tracking-[-0.03em]">{priceLabel ?? "A confirmar"}</p>
+                </div>
+                <p className="text-right text-[13px] text-subtle">{site.offer.terms}</p>
+                <BuyButton className="btn btn-primary mt-5 h-14 w-full text-[16px]">{site.hero.cta}</BuyButton>
+                {site.guarantee.confirmed ? <p className="mt-3 text-center text-[13px] text-muted">{site.guarantee.body}</p> : null}
+                {placeholder ? <PlaceholderNotice className="mt-4" /> : null}
+                <ol className="mt-6 grid gap-3 border-t border-line pt-5 sm:grid-cols-3">
+                  {site.how.steps.map((step, index) => (
+                    <li key={step.id} className="text-[13px] leading-snug text-muted">
+                      <span className="font-medium text-ink">
+                        {index + 1}. {step.title}
+                      </span>
+                      <br />
+                      {step.body}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
           </Container>
         </section>
 
