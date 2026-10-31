@@ -53,12 +53,12 @@ export function RecentlyViewed({ current }: { current: string }) {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-8">
-      <h2 className="text-4xl font-bold tracking-[-0.045em]">Visto recién</h2>
-      <div className="mt-6 flex gap-4 overflow-x-auto pb-2">
+    <section className="mx-auto max-w-6xl px-5 py-12 sm:px-8">
+      <h2 className="font-display text-[24px] font-bold tracking-[-0.03em]">Visto recién</h2>
+      <div className="no-scrollbar mt-5 -mx-5 flex snap-x gap-4 overflow-x-auto px-5 pb-2 sm:mx-0 sm:px-0">
         {items.map((product) => (
-          <div key={product.slug} className="w-[280px] shrink-0">
-            <ProductCard product={product} layout="tile" />
+          <div key={product.slug} className="w-[200px] shrink-0 snap-start">
+            <ProductCard product={product} />
           </div>
         ))}
       </div>

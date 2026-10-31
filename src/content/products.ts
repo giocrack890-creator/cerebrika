@@ -23,6 +23,8 @@ export const categories = [
 
 export type CategoryId = (typeof categories)[number]["id"];
 export type CoverLayout = "frame" | "band" | "split" | "stack";
+/** Tonos de tapa dentro de la paleta de marca. */
+export type CoverTone = "violet" | "lavender" | "ink" | "paper" | "deep";
 
 export type Chapter = { number: string; title: string; summary: string };
 
@@ -49,7 +51,7 @@ export type CatalogProduct = {
   minutes: number;
   outcomes: readonly string[];
   pairsWith: string | null;
-  cover: { kicker: string; headline: string; line: string; color: string; layout: CoverLayout };
+  cover: { kicker: string; headline: string; line: string; tone: CoverTone; layout: CoverLayout };
   chaptersNote: string;
   chapters: readonly Chapter[];
   forYou: readonly string[];
@@ -68,7 +70,7 @@ function soon(input: {
   priceArs: number;
   pages: number;
   minutes: number;
-  color: string;
+  tone: CoverTone;
   layout: CoverLayout;
   headline: string;
   line: string;
@@ -94,7 +96,7 @@ function soon(input: {
       kicker: "Cerebrika",
       headline: input.headline,
       line: input.line,
-      color: input.color,
+      tone: input.tone,
       layout: input.layout,
     },
   };
@@ -131,7 +133,7 @@ export const products: readonly CatalogProduct[] = [
       kicker: "Cerebrika",
       headline: "IA para docentes",
       line: "Planificá tu semana en 1 hora",
-      color: "#3730A3",
+      tone: "violet",
       layout: "frame",
     },
     chaptersNote: "Índice en borrador. Los capítulos todavía no están redactados.",
@@ -166,7 +168,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 36,
     minutes: 40,
-    color: "#6B4F3B",
+    tone: "lavender",
     layout: "band",
     headline: "Devolver trabajos",
     line: "El finde, para vos",
@@ -190,7 +192,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 32,
     minutes: 35,
-    color: "#EA580C",
+    tone: "ink",
     layout: "split",
     headline: "La reunión",
     line: "Decisiones, no notas",
@@ -214,7 +216,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 40,
     minutes: 45,
-    color: "#DC2626",
+    tone: "paper",
     layout: "stack",
     headline: "La semana laboral",
     line: "Una hora, cinco días",
@@ -238,7 +240,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 28,
     minutes: 30,
-    color: "#3730A3",
+    tone: "violet",
     layout: "band",
     headline: "El mail",
     line: "El que venís postergando",
@@ -262,7 +264,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 36,
     minutes: 40,
-    color: "#EA580C",
+    tone: "ink",
     layout: "frame",
     headline: "Estudiar",
     line: "Un tema en 45 minutos",
@@ -286,7 +288,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 30,
     minutes: 35,
-    color: "#DC2626",
+    tone: "paper",
     layout: "split",
     headline: "El parcial",
     line: "La tarde anterior",
@@ -310,7 +312,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 34,
     minutes: 40,
-    color: "#6B4F3B",
+    tone: "lavender",
     layout: "stack",
     headline: "Leer un paper",
     line: "Sin perder el hilo",
@@ -334,7 +336,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 38,
     minutes: 45,
-    color: "#111111",
+    tone: "deep",
     layout: "frame",
     headline: "La hoja en blanco",
     line: "Un borrador, hoy",
@@ -358,7 +360,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 32,
     minutes: 40,
-    color: "#DC2626",
+    tone: "paper",
     layout: "band",
     headline: "Un cuento",
     line: "De una sentada",
@@ -382,7 +384,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 34,
     minutes: 40,
-    color: "#EA580C",
+    tone: "ink",
     layout: "stack",
     headline: "Tu CV",
     line: "Hechos, no adjetivos",
@@ -406,7 +408,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 36,
     minutes: 40,
-    color: "#3730A3",
+    tone: "violet",
     layout: "split",
     headline: "La entrevista",
     line: "Tus casos, no un manual",
@@ -430,7 +432,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 28,
     minutes: 30,
-    color: "#6B4F3B",
+    tone: "lavender",
     layout: "frame",
     headline: "El menú",
     line: "Cinco comidas, una lista",
@@ -454,7 +456,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 7000,
     pages: 24,
     minutes: 25,
-    color: "#EA580C",
+    tone: "ink",
     layout: "band",
     headline: "El desorden",
     line: "Una zona, una hora",
@@ -478,7 +480,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 30,
     minutes: 35,
-    color: "#DC2626",
+    tone: "paper",
     layout: "stack",
     headline: "Un viaje corto",
     line: "Tres días, un plan",
@@ -607,4 +609,10 @@ export function resolvePaidProduct(payment: PaymentMatch): Product | null {
     if (matchesId || matchesReference) return product;
   }
   return null;
+}
+
+/** true si lo que se descarga hoy es el PDF marcador y no el libro. */
+export function isPlaceholderDownload(slug: string): boolean {
+  const product = getProduct(slug);
+  return Boolean(product && product.status === "available" && !product.manuscriptReady);
 }

@@ -1,13 +1,22 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Bricolage_Grotesque, Geist } from "next/font/google";
+import { Suspense } from "react";
+import { MetaPixel } from "@/components/analytics/meta-pixel";
 import { CartProvider } from "@/components/store/cart-provider";
 import { storeConfig } from "@/content/products";
 import { site } from "@/content/site";
 import { getWhatsappNumber } from "@/lib/env";
 import "./globals.css";
 
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
+  variable: "--font-geist",
+  display: "swap",
+});
+
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage",
   display: "swap",
 });
 
@@ -23,7 +32,7 @@ function metadataBase(): URL | undefined {
 
 const base = metadataBase();
 
-const pageTitle = `${site.brand.name} · Ebooks de IA`;
+const pageTitle = `${site.brand.name} · Ebooks cortos de IA`;
 
 export const metadata: Metadata = {
   title: pageTitle,
@@ -39,25 +48,34 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#f7f6f2",
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const whatsapp = getWhatsappNumber();
   const announcement = storeConfig.announcement.trim();
   return (
-    <html lang="es-AR" className={`${inter.className} h-full antialiased`}>
-      <body className="min-h-full bg-[#F5F2EB] text-[#111111]">
+    <html lang="es-AR" className={`${geist.variable} ${bricolage.variable} h-full antialiased`}>
+      <body className="min-h-full bg-paper font-sans text-ink">
         {announcement ? (
-          <p className="bg-black px-4 py-2 text-center text-[11px] font-semibold tracking-[0.14em] text-white">{announcement}</p>
+          <p className="bg-accent px-4 py-2 text-center text-[13px] font-medium text-white">{announcement}</p>
         ) : null}
         <CartProvider>{children}</CartProvider>
         {whatsapp ? (
           <a
             href={`https://wa.me/${whatsapp}`}
-            className="fixed right-4 bottom-24 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-black text-[10px] font-bold tracking-tight text-white"
+            className="fixed right-4 bottom-24 z-40 flex h-12 w-12 items-center justify-center rounded-full bg-ink text-white transition-transform active:scale-95"
             aria-label="Escribir por WhatsApp"
           >
-            WA
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.8L4 20Z" strokeLinejoin="round" />
+            </svg>
           </a>
         ) : null}
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
       </body>
     </html>
   );

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Container } from "@/components/landing/sections";
 import { StoreFooter } from "@/components/store/footer";
-import { StoreChrome } from "@/components/store/header";
-import Link from "next/link";
+import { SiteHeader } from "@/components/store/header";
+import { CheckIcon } from "@/components/ui/icons";
 
 export default function AccountPage() {
   const [pending, setPending] = useState(false);
@@ -41,36 +42,51 @@ export default function AccountPage() {
 
   return (
     <>
-      <StoreChrome
-        bar="Mis compras"
-        showBar={false}
-        corner={
-          <Link href="/catalogo" className="rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.16em] text-white">
-            CATÁLOGO
-          </Link>
-        }
-        barAction={null}
-      />
-      <main id="inicio" className="mx-auto max-w-xl px-6 pt-10 pb-24">
-        <p className="text-xs font-semibold tracking-[0.22em] uppercase">Mi cuenta</p>
-        <h1 className="mt-4 text-[clamp(2.6rem,6vw,4.4rem)] leading-[0.9] font-bold tracking-[-0.055em]">Mis compras</h1>
-        <p className="mt-4 text-lg leading-relaxed text-black/70">
-          No hay contraseña. Si ya pagaste, te reenviamos los enlaces de descarga a ese mail.
-        </p>
-        <form onSubmit={onSubmit} className="relative mt-8 rounded-[28px] bg-white p-6">
-          <label className="text-sm font-medium" htmlFor="cuenta-email">
-            Email de la compra
-          </label>
-          <input id="cuenta-email" name="email" type="email" required autoComplete="email" className="mt-2 w-full rounded-full bg-[#F5F2EB] px-5 py-3 outline-none" />
-          <div className="absolute left-[-9999px] h-0 overflow-hidden" aria-hidden="true">
-            <input name="company" tabIndex={-1} autoComplete="off" />
+      <SiteHeader />
+      <main id="contenido" className="pb-12 sm:pb-24">
+        <Container className="pt-8 sm:pt-14">
+          <div className="max-w-lg">
+            <p className="text-[13px] font-medium text-accent">Mis compras</p>
+            <h1 className="font-display mt-2 text-[clamp(2.4rem,9vw,3.5rem)] leading-[0.98] font-bold tracking-[-0.045em]">
+              Volvé a bajar tus ebooks
+            </h1>
+            <p className="mt-4 text-[16px] leading-relaxed text-muted">
+              No hace falta contraseña. Escribí el mail con el que pagaste y te reenviamos los enlaces de descarga, renovados.
+            </p>
+            <form onSubmit={onSubmit} className="relative mt-8 rounded-[24px] bg-surface p-5 shadow-[inset_0_0_0_1px_var(--line)] sm:p-6">
+              <label className="text-[14px] font-medium" htmlFor="cuenta-email">
+                Email de la compra
+              </label>
+              <input
+                id="cuenta-email"
+                name="email"
+                type="email"
+                inputMode="email"
+                required
+                autoComplete="email"
+                placeholder="tu@escuela.edu.ar"
+                className="field mt-2"
+              />
+              <div className="absolute left-[-9999px] h-0 overflow-hidden" aria-hidden="true">
+                <input name="company" tabIndex={-1} autoComplete="off" />
+              </div>
+              <button type="submit" disabled={pending} className="btn btn-ink mt-4 w-full">
+                {pending ? "Enviando…" : "Reenviar enlaces"}
+              </button>
+              {message ? (
+                <p role="status" className="mt-4 flex gap-2 text-[14px] leading-relaxed">
+                  <CheckIcon className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                  {message}
+                </p>
+              ) : null}
+              {error ? (
+                <p role="alert" className="mt-4 text-[14px] text-danger">
+                  {error}
+                </p>
+              ) : null}
+            </form>
           </div>
-          <button type="submit" disabled={pending} className="mt-5 rounded-full bg-black px-5 py-3 text-[11px] font-semibold tracking-[0.14em] text-white disabled:opacity-60">
-            {pending ? "Enviando…" : "REENVIAR ENLACES"}
-          </button>
-          {message ? <p role="status" className="mt-4 text-sm">{message}</p> : null}
-          {error ? <p role="alert" className="mt-4 text-sm text-[#DC2626]">{error}</p> : null}
-        </form>
+        </Container>
       </main>
       <StoreFooter />
     </>

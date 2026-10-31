@@ -1,44 +1,30 @@
 import type { Metadata } from "next";
-import { BuyButton, CheckoutProvider } from "@/components/landing/checkout";
-import { StoreFooter } from "@/components/store/footer";
-import { StoreChrome } from "@/components/store/header";
-import { getFlagship, resolvePriceArs } from "@/content/products";
-import { site } from "@/content/site";
-import { formatArs } from "@/lib/format";
+import Link from "next/link";
+import { TextPage } from "@/components/landing/text-page";
+import { isPlaceholder, site } from "@/content/site";
 
 export const metadata: Metadata = {
   title: `Contacto · ${site.brand.name}`,
-  description: "Escribinos por el ebook o por un aviso del catálogo.",
+  description: "Escribinos por un ebook, un pago o un enlace de descarga.",
 };
 
-const cornerClass = "rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.16em] text-white";
-const barClass =
-  "shrink-0 rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.14em] whitespace-nowrap text-white";
-
 export default function ContactPage() {
-  const flagship = getFlagship();
-  const price = resolvePriceArs(flagship);
-  const priceLabel = price ? formatArs(price) : null;
+  const contact = isPlaceholder(site.footer.contact) ? null : site.footer.contact;
+  const seller = isPlaceholder(site.footer.seller) ? null : site.footer.seller;
 
   return (
-    <CheckoutProvider productSlug={flagship.slug} productTitle={flagship.title} priceLabel={priceLabel}>
-      <StoreChrome
-        bar={site.chrome.bar}
-        corner={<BuyButton label={site.chrome.buy} className={cornerClass} />}
-        barAction={<BuyButton label={site.chrome.barButton} className={barClass} />}
-      />
-      <main id="inicio" className="mx-auto max-w-3xl px-6 pt-10 pb-32">
-        <p className="text-xs font-semibold tracking-[0.22em] uppercase">Contacto</p>
-        <h1 className="mt-4 text-[clamp(2.8rem,7vw,5.2rem)] leading-[0.9] font-bold tracking-[-0.055em]">
-          Escribinos.
-        </h1>
-        <p className="mt-8 text-lg leading-relaxed text-black/75">
-          No hay cuenta de usuario. El ebook llega al mail con el que pagás. Si el enlace se vence o no aparece, respondé ese mail.
+    <TextPage kicker="Contacto" title="Escribinos">
+      <p>
+        No hay cuenta de usuario: el ebook llega al mail con el que pagás. Si el enlace se venció, lo pedís de nuevo desde{" "}
+        <Link href="/cuenta">Mis compras</Link>.
+      </p>
+      <p>Para cualquier otra consulta, respondé el mail de la compra{contact ? " o escribinos a:" : "."}</p>
+      {contact ? (
+        <p className="font-display text-[22px] font-bold tracking-[-0.02em] text-ink">
+          <a href={`mailto:${contact}`}>{contact}</a>
         </p>
-        <p className="mt-6 text-lg font-semibold">{site.footer.contact}</p>
-        <p className="mt-2 text-sm text-black/60">{site.footer.seller}</p>
-      </main>
-      <StoreFooter />
-    </CheckoutProvider>
+      ) : null}
+      {seller ? <p className="text-[14px] text-subtle">{seller}</p> : null}
+    </TextPage>
   );
 }

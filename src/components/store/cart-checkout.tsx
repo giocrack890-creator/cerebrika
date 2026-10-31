@@ -4,8 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { BookCover } from "@/components/store/book-cover";
 import { useCart } from "@/components/store/cart-provider";
+import { productParams, trackPixel } from "@/lib/analytics/meta-pixel";
 import { coupons, quoteCart } from "@/lib/cart-math";
-import { getProduct } from "@/content/products";
+import { getProduct, isPlaceholderDownload } from "@/content/products";
+import { site } from "@/content/site";
 import { formatArs } from "@/lib/format";
 
 export function CartCheckout() {
@@ -13,6 +15,7 @@ export function CartCheckout() {
   const quote = quoteCart(slugs);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const placeholder = quote.ok && quote.lines.some((line) => isPlaceholderDownload(line.slug));
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,72 +36,102 @@ export function CartCheckout() {
       });
       const data = (await response.json().catch(() => null)) as { error?: string; initPoint?: string } | null;
       if (!response.ok || !data?.initPoint) {
-        setError(data?.error ?? "No pudimos abrir el pago.");
+        setError(data?.error ?? site.checkout.genericError);
         setPending(false);
         return;
       }
+      trackPixel(
+        "InitiateCheckout",
+        productParams(quote.lines.map((line) => ({ slug: line.slug, title: line.title, price: line.unitPrice }))),
+      );
       window.location.assign(data.initPoint);
     } catch {
-      setError("No pudimos abrir el pago.");
+      setError(site.checkout.genericError);
       setPending(false);
     }
   }
 
-  return (
-    <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-      <div>
-        {!quote.ok ? (
-          <p className="text-lg text-black/70">
-            La bolsa está vacía. <Link href="/catalogo" className="font-semibold text-black">Ver el catálogo</Link>
-          </p>
-        ) : (
-          <ul className="space-y-4">
-            {quote.lines.map((line) => {
-              const product = getProduct(line.slug);
-              return (
-                <li key={line.slug} className="flex gap-4 rounded-[24px] bg-white p-4">
-                  {product ? (
-                    <div className="w-16 shrink-0">
-                      <BookCover product={product} compact />
-                    </div>
-                  ) : null}
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold tracking-[-0.02em]">{line.title}</p>
-                    <p className="text-sm">{formatArs(line.unitPrice)}</p>
-                    <button type="button" className="mt-2 text-[11px] font-semibold tracking-[0.12em]" onClick={() => remove(line.slug)}>
-                      QUITAR
-                    </button>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+  if (!quote.ok) {
+    return (
+      <div className="rounded-[24px] bg-surface px-5 py-10 text-center shadow-[inset_0_0_0_1px_var(--line)] sm:px-10">
+        <p className="font-display text-[22px] font-bold tracking-[-0.02em]">Tu carrito está vacío</p>
+        <p className="mx-auto mt-2 max-w-sm text-[15px] text-muted">Elegí un ebook del catálogo. Cada uno se agrega una sola vez.</p>
+        <Link href="/catalogo" className="btn btn-ink mt-6">
+          Ver el catálogo
+        </Link>
       </div>
-      <form onSubmit={onSubmit} className="h-fit rounded-[28px] bg-white p-6">
-        <p className="text-sm text-black/60">Subtotal</p>
-        <p className="text-4xl font-bold tracking-[-0.045em]">{quote.ok ? formatArs(quote.subtotal) : formatArs(0)}</p>
-        {quote.ok && quote.discount > 0 ? <p className="mt-2 text-sm">Cupón − {formatArs(quote.discount)}</p> : null}
-        <label className="mt-6 block text-sm font-medium" htmlFor="cart-email">
-          Email
+    );
+  }
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10">
+      <ul className="divide-y divide-line rounded-[24px] bg-surface px-5 shadow-[inset_0_0_0_1px_var(--line)]">
+        {quote.lines.map((line) => {
+          const product = getProduct(line.slug);
+          return (
+            <li key={line.slug} className="flex gap-4 py-5">
+              {product ? (
+                <Link href={`/productos/${line.slug}`} className="w-16 shrink-0">
+                  <BookCover product={product} compact />
+                </Link>
+              ) : null}
+              <div className="min-w-0 flex-1">
+                <p className="text-[16px] leading-snug font-medium">{line.title}</p>
+                <p className="mt-1 text-[14px] text-muted">PDF · entrega por mail</p>
+                <button
+                  type="button"
+                  className="mt-2 text-[13px] font-medium text-subtle underline-offset-4 hover:text-ink hover:underline"
+                  onClick={() => remove(line.slug)}
+                >
+                  Quitar
+                </button>
+              </div>
+              <p className="shrink-0 text-[16px] font-semibold">{formatArs(line.unitPrice)}</p>
+            </li>
+          );
+        })}
+      </ul>
+      <form onSubmit={onSubmit} className="relative h-fit rounded-[24px] bg-surface p-5 shadow-[inset_0_0_0_1px_var(--line)] sm:p-6">
+        <div className="flex items-baseline justify-between">
+          <p className="text-[14px] text-muted">Total</p>
+          <p className="font-display text-[28px] font-bold tracking-[-0.03em]">{formatArs(quote.total)}</p>
+        </div>
+        {quote.discount > 0 ? <p className="mt-1 text-right text-[13px] text-muted">Cupón − {formatArs(quote.discount)}</p> : null}
+        <label className="mt-6 block text-[14px] font-medium" htmlFor="cart-email">
+          {site.checkout.emailLabel}
         </label>
-        <input id="cart-email" name="email" type="email" required autoComplete="email" placeholder="tu@escuela.edu.ar" className="mt-2 w-full rounded-full bg-[#F5F2EB] px-5 py-3 outline-none" />
+        <input
+          id="cart-email"
+          name="email"
+          type="email"
+          inputMode="email"
+          required
+          autoComplete="email"
+          placeholder={site.checkout.emailPlaceholder}
+          className="field mt-2"
+        />
+        <p className="mt-2 text-[13px] text-subtle">{site.checkout.emailHint}</p>
         {coupons.length > 0 ? (
           <>
-            <label className="mt-4 block text-sm font-medium" htmlFor="cart-coupon">
+            <label className="mt-4 block text-[14px] font-medium" htmlFor="cart-coupon">
               Cupón
             </label>
-            <input id="cart-coupon" name="coupon" className="mt-2 w-full rounded-full bg-[#F5F2EB] px-5 py-3 outline-none" />
+            <input id="cart-coupon" name="coupon" className="field mt-2" />
           </>
         ) : null}
         <div className="absolute left-[-9999px] h-0 overflow-hidden" aria-hidden="true">
           <input name="company" tabIndex={-1} autoComplete="off" />
         </div>
-        {error ? <p role="alert" className="mt-4 text-sm text-[#DC2626]">{error}</p> : null}
-        <button type="submit" disabled={pending || !quote.ok} className="mt-6 w-full rounded-full bg-black px-5 py-3 text-[11px] font-semibold tracking-[0.16em] text-white disabled:opacity-60">
-          {pending ? "Abriendo Mercado Pago…" : "PAGAR CON MERCADO PAGO"}
+        {error ? (
+          <p role="alert" className="mt-4 text-[14px] text-danger">
+            {error}
+          </p>
+        ) : null}
+        <button type="submit" disabled={pending} className="btn btn-primary mt-5 w-full">
+          {pending ? site.checkout.submitting : site.checkout.submit}
         </button>
-        <p className="mt-3 text-sm text-black/60">Cada ebook entra una sola vez. El PDF llega al mail cuando el pago se aprueba.</p>
+        <p className="mt-3 text-[13px] leading-relaxed text-subtle">Pago único. El PDF llega a tu mail cuando el pago se aprueba.</p>
+        {placeholder ? <p className="mt-2 text-[13px] leading-relaxed text-subtle">{site.placeholderNotice}</p> : null}
       </form>
     </div>
   );
