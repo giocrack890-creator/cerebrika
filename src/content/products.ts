@@ -121,8 +121,8 @@ export const products: readonly CatalogProduct[] = [
     badge: "Destacado",
     fileName: "ia-para-docentes.pdf",
     storagePath: null,
-    pages: 48,
-    minutes: 55,
+    pages: 30,
+    minutes: 40,
     outcomes: [
       "Bajar la semana a cinco días con inicio, desarrollo y cierre.",
       "Pedirle a un chat una clase en castellano, sin jerga.",
@@ -136,7 +136,7 @@ export const products: readonly CatalogProduct[] = [
       tone: "violet",
       layout: "frame",
     },
-    chaptersNote: "Índice en borrador. Los capítulos todavía no están redactados.",
+    chaptersNote: "Índice completo: 30 páginas en PDF, con 16 pedidos para copiar y una checklist de revisión.",
     chapters: [
       { number: "01", title: "Para qué sirve la IA en el aula, y para qué no", summary: "Límites de la herramienta antes de usarla con un grupo." },
       { number: "02", title: "Tu primera conversación con un chat", summary: "Cómo abrir, pedir y volver a pedir, sin jerga." },
@@ -145,7 +145,7 @@ export const products: readonly CatalogProduct[] = [
       { number: "05", title: "Armar una clase que entra en el módulo", summary: "Inicio, desarrollo y cierre con tiempos." },
       { number: "06", title: "Actividades para ritmos distintos", summary: "Variar una misma consigna sin armar dos clases." },
       { number: "07", title: "Revisar lo que escribió la IA", summary: "Datos, tono y si se puede hacer de verdad." },
-      { number: "08", title: "Una rutina de una hora para toda la semana", summary: "El método, paso a paso, cuando el texto esté cerrado." },
+      { number: "08", title: "Una rutina de una hora para toda la semana", summary: "El método, paso a paso, con tiempos." },
     ],
     forYou: [
       "Planificás clases y el domingo se te va en eso.",
@@ -155,9 +155,8 @@ export const products: readonly CatalogProduct[] = [
     notForYou: [
       "Buscás aprender a programar.",
       "Ya armás todo tu trabajo con IA y querés un nivel avanzado.",
-      "Necesitás hoy el libro con el texto definitivo: el manuscrito sigue en preparación.",
     ],
-    manuscriptReady: false,
+    manuscriptReady: true,
   },
   soon({
     slug: "ia-para-devolver-trabajos",
@@ -611,8 +610,3 @@ export function resolvePaidProduct(payment: PaymentMatch): Product | null {
   return null;
 }
 
-/** true si lo que se descarga hoy es el PDF marcador y no el libro. */
-export function isPlaceholderDownload(slug: string): boolean {
-  const product = getProduct(slug);
-  return Boolean(product && product.status === "available" && !product.manuscriptReady);
-}

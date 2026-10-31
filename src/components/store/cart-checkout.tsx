@@ -6,16 +6,16 @@ import { BookCover } from "@/components/store/book-cover";
 import { useCart } from "@/components/store/cart-provider";
 import { productParams, trackPixel } from "@/lib/analytics/meta-pixel";
 import { coupons, quoteCart } from "@/lib/cart-math";
-import { getProduct, isPlaceholderDownload } from "@/content/products";
+import { getProduct } from "@/content/products";
 import { site } from "@/content/site";
 import { formatArs } from "@/lib/format";
 
-export function CartCheckout() {
+export function CartCheckout({ placeholderSlugs = [] }: { placeholderSlugs?: readonly string[] }) {
   const { slugs, remove } = useCart();
   const quote = quoteCart(slugs);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const placeholder = quote.ok && quote.lines.some((line) => isPlaceholderDownload(line.slug));
+  const placeholder = quote.ok && quote.lines.some((line) => placeholderSlugs.includes(line.slug));
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

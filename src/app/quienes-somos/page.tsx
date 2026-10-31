@@ -22,7 +22,6 @@ export default function AboutPage() {
         Hoy se puede comprar uno: <Link href={`/productos/${flagship.slug}`}>{flagship.title}</Link>. El resto del catálogo
         está anunciado y todavía no está a la venta. Si dejás el mail en la ficha, te avisamos cuando salga.
       </p>
-      {flagship.manuscriptReady ? null : <p>El texto final del ebook de docentes sigue en preparación. La página lo dice antes de pagar.</p>}
     </TextPage>
   );
 }

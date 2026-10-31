@@ -13,6 +13,7 @@ import { prompts } from "@/content/prompts";
 import { fillFaq, selectTestimonials, site } from "@/content/site";
 import { getDownloadTtlHours } from "@/lib/env";
 import { formatArs } from "@/lib/format";
+import { isDeliveryReady } from "@/lib/storage";
 
 export default function HomePage() {
   return (
@@ -81,7 +82,7 @@ async function LiveHome() {
   const flagship = getFlagship();
   const price = resolvePriceArs(flagship);
   const priceLabel = price ? formatArs(price) : null;
-  const placeholder = !flagship.manuscriptReady;
+  const placeholder = !isDeliveryReady(flagship);
   const faq = fillFaq(priceLabel ?? "el que figura al pagar", getDownloadTtlHours());
   const testimonials = selectTestimonials(site.testimonials, process.env.NODE_ENV).filter((item) => !item.placeholder);
   const upcoming = products.filter((product) => product.status === "coming_soon");

@@ -1,4 +1,4 @@
-import { FLAGSHIP_SLUG, type Product } from "@/content/products";
+import { FLAGSHIP_SLUG, getProduct, type Product } from "@/content/products";
 
 /**
  * El destacado usa EBOOK_STORAGE_PATH si existe.
@@ -13,4 +13,18 @@ export function resolveProductStorage(product: Product | null): { bucket: string
       : product.storagePath;
   if (!path) return null;
   return { bucket, path };
+}
+
+/**
+ * true si quien compra hoy recibe el libro y no el PDF marcador:
+ * el texto está terminado y el archivo está configurado en Storage.
+ * Se lee en el servidor; si cambian las variables, hay que volver a desplegar.
+ */
+export function isDeliveryReady(product: Product | undefined | null): boolean {
+  if (!product || product.status !== "available") return true;
+  return product.manuscriptReady && resolveProductStorage(product) !== null;
+}
+
+export function placeholderSlugs(slugs: readonly string[]): string[] {
+  return slugs.filter((slug) => !isDeliveryReady(getProduct(slug)));
 }

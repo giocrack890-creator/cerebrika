@@ -11,6 +11,7 @@ import { getProduct, products, resolvePriceArs } from "@/content/products";
 import { fillFaq, site } from "@/content/site";
 import { getDownloadTtlHours } from "@/lib/env";
 import { formatArs } from "@/lib/format";
+import { isDeliveryReady } from "@/lib/storage";
 
 export function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
@@ -74,7 +75,7 @@ async function LiveProduct({ params }: { params: Promise<{ slug: string }> }) {
         }
       />
       <main>
-        <ProductView product={product} price={price} faq={faq} />
+        <ProductView product={product} price={price} faq={faq} placeholder={!isDeliveryReady(product)} />
       </main>
       <StoreFooter />
     </>
@@ -87,7 +88,7 @@ async function LiveProduct({ params }: { params: Promise<{ slug: string }> }) {
       productSlug={product.slug}
       productTitle={product.title}
       price={price}
-      placeholderNotice={product.manuscriptReady ? null : site.placeholderNotice}
+      placeholderNotice={isDeliveryReady(product) ? null : site.placeholderNotice}
     >
       {body}
     </CheckoutProvider>

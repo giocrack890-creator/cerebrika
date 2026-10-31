@@ -19,17 +19,19 @@ export function ProductView({
   product,
   price,
   faq,
+  placeholder,
 }: {
   product: Product;
   price: number | null;
   faq: readonly { q: string; a: string }[];
+  /** true si hoy se entregaría el PDF marcador. Lo decide el servidor. */
+  placeholder: boolean;
 }) {
   const comingSoon = product.status === "coming_soon";
   const priceLabel = price ? formatArs(price) : null;
   const related = relatedProducts(product.slug).filter((item) => item.slug !== product.pairsWith);
   const aviso = waitlistSource(product.slug);
   const pair = product.pairsWith ? getProduct(product.pairsWith) : undefined;
-  const placeholder = !comingSoon && !product.manuscriptReady;
   const showCompare = !comingSoon && product.compareAtArs !== null && price !== null && product.compareAtArs > price;
   const avisoHref = `#aviso-${product.slug}`;
 

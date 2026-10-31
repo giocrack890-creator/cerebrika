@@ -19,7 +19,7 @@ export const site = {
     description:
       "Ebooks cortos para usar la IA en un trabajo concreto. El primero es para docentes: planificá tu semana de clases en una hora.",
   },
-  /** Se muestra junto a cada botón de compra mientras el ebook tenga manuscriptReady en false. */
+  /** Se muestra junto a cada botón de compra mientras la entrega no esté lista (texto o archivo en Storage). */
   placeholderNotice:
     "El texto final todavía no está publicado. Si comprás ahora, el PDF que llega es un marcador de posición, no el libro.",
   hero: {
