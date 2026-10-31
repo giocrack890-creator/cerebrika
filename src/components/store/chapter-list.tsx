@@ -1,37 +1,18 @@
-"use client";
-
-import { useState } from "react";
 import type { Chapter } from "@/content/products";
 
+/** Índice completo, a la vista: en el celular un acordeón esconde lo que más vende. */
 export function ChapterList({ chapters }: { chapters: readonly Chapter[] }) {
-  const [open, setOpen] = useState<string | null>(null);
-
   return (
-    <div className="mt-6">
-      {chapters.map((chapter) => {
-        const isOpen = open === chapter.number;
-        return (
-          <div key={chapter.number} className="border-t border-black/10">
-            <h3>
-              <button
-                type="button"
-                className="flex w-full items-center justify-between gap-4 py-4 text-left"
-                aria-expanded={isOpen}
-                onClick={() => setOpen(isOpen ? null : chapter.number)}
-              >
-                <span className="text-lg font-semibold tracking-[-0.03em]">
-                  <span className="mr-3 text-xs tracking-[0.14em] text-black/45">{chapter.number}</span>
-                  {chapter.title}
-                </span>
-                <span aria-hidden="true" className="text-black/40">
-                  {isOpen ? "–" : "+"}
-                </span>
-              </button>
-            </h3>
-            {isOpen ? <p className="pb-4 pl-9 text-sm leading-relaxed text-black/70">{chapter.summary}</p> : null}
+    <ol className="divide-y divide-line border-y border-line">
+      {chapters.map((chapter) => (
+        <li key={chapter.number} className="grid grid-cols-[40px_1fr] gap-x-3 py-4 sm:grid-cols-[56px_1fr]">
+          <span className="font-display pt-0.5 text-[15px] font-bold text-accent">{chapter.number}</span>
+          <div>
+            <p className="text-[16px] leading-snug font-medium">{chapter.title}</p>
+            <p className="mt-1 text-[14px] leading-relaxed text-muted">{chapter.summary}</p>
           </div>
-        );
-      })}
-    </div>
+        </li>
+      ))}
+    </ol>
   );
 }

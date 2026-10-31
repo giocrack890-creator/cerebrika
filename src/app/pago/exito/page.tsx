@@ -1,22 +1,54 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { connection } from "next/server";
+import { TrackProductEvent } from "@/components/analytics/meta-pixel";
+import { ResultScreen } from "@/components/landing/result";
 import { ClearCartOnMount } from "@/components/store/cart-provider";
 import { site } from "@/content/site";
+import { fetchMercadoPagoPayment } from "@/lib/payments/mercadopago";
+import { purchaseEventFromPayment, type PurchaseEvent } from "@/lib/payments/purchase-event";
 
-export default function SuccessPage() {
+type Query = { payment_id?: string | string[]; collection_id?: string | string[] };
+
+function one(value: string | string[] | undefined): string {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return (raw ?? "").trim();
+}
+
+export default function SuccessPage({ searchParams }: { searchParams: Promise<Query> }) {
   return (
-    <main className="flex min-h-[100svh] items-center justify-center bg-[#F5F2EB] px-6 py-16">
-      <ClearCartOnMount />
-      <div className="w-full max-w-xl rounded-[32px] bg-white p-8 sm:p-12">
-        <p className="text-xs font-semibold tracking-[0.18em] uppercase">{site.brand.name}</p>
-        <h1 className="mt-4 text-4xl font-bold tracking-[-0.045em]">{site.payments.successTitle}</h1>
-        <p className="mt-4 text-lg leading-relaxed text-black/70">{site.payments.successBody}</p>
-        <p className="mt-4 text-base leading-relaxed text-black/70">
-          Si compraste más de un ebook, el mail trae un enlace por título.
-        </p>
-        <Link href="/cuenta" className="mt-8 inline-flex rounded-full bg-black px-5 py-3 text-[11px] font-semibold tracking-[0.16em] text-white">
-          MIS COMPRAS
+    <ResultScreen
+      tone="success"
+      title={site.payments.successTitle}
+      body={site.payments.successBody}
+      action={
+        <Link href="/cuenta" className="btn btn-primary">
+          {site.payments.successAccount}
         </Link>
-      </div>
-    </main>
+      }
+    >
+      <p className="mt-3 text-[15px] leading-relaxed text-muted">{site.payments.successMulti}</p>
+      <ClearCartOnMount />
+      <Suspense fallback={null}>
+        <PurchasePixel searchParams={searchParams} />
+      </Suspense>
+    </ResultScreen>
   );
+}
+
+/** Confirma el pago contra Mercado Pago antes de mandar Purchase al píxel. */
+async function PurchasePixel({ searchParams }: { searchParams: Promise<Query> }) {
+  await connection();
+  const params = await searchParams;
+  const paymentId = one(params.payment_id) || one(params.collection_id);
+  if (!paymentId || !process.env.NEXT_PUBLIC_META_PIXEL_ID) return null;
+
+  let event: PurchaseEvent | null = null;
+  try {
+    event = purchaseEventFromPayment(await fetchMercadoPagoPayment(paymentId));
+  } catch (error) {
+    console.error("purchase_pixel_lookup_failed", error instanceof Error ? error.message : "unknown");
+  }
+  if (!event) return null;
+  return <TrackProductEvent event="Purchase" items={event.items} eventId={event.eventId} />;
 }

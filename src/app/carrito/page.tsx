@@ -1,34 +1,27 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { StoreFooter } from "@/components/store/footer";
-import { StoreChrome } from "@/components/store/header";
+import { Container } from "@/components/landing/sections";
 import { CartCheckout } from "@/components/store/cart-checkout";
+import { StoreFooter } from "@/components/store/footer";
+import { SiteHeader } from "@/components/store/header";
+import { products } from "@/content/products";
 import { site } from "@/content/site";
+import { placeholderSlugs } from "@/lib/storage";
 
 export const metadata: Metadata = {
   title: `Carrito · ${site.brand.name}`,
 };
 
-const cornerClass = "rounded-full bg-black px-4 py-3 text-[11px] font-semibold tracking-[0.16em] text-white";
-
 export default function CartPage() {
   return (
     <>
-      <StoreChrome
-        bar="Tu carrito"
-        showBar={false}
-        corner={
-          <Link href="/catalogo" className={cornerClass}>
-            CATÁLOGO
-          </Link>
-        }
-        barAction={null}
-      />
-      <main id="inicio" className="mx-auto max-w-5xl px-6 pt-10 pb-24">
-        <h1 className="text-[clamp(2.8rem,7vw,5rem)] leading-[0.9] font-bold tracking-[-0.055em]">Carrito</h1>
-        <div className="mt-8">
-          <CartCheckout />
-        </div>
+      <SiteHeader />
+      <main id="contenido" className="pb-12 sm:pb-24">
+        <Container className="pt-8 sm:pt-14">
+          <h1 className="font-display text-[clamp(2.4rem,9vw,3.5rem)] leading-[0.98] font-bold tracking-[-0.045em]">Carrito</h1>
+          <div className="mt-8">
+            <CartCheckout placeholderSlugs={placeholderSlugs(products.map((product) => product.slug))} />
+          </div>
+        </Container>
       </main>
       <StoreFooter />
     </>

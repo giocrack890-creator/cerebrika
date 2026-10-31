@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Manuscritos y PDFs a la venta: el repo es público, el libro no.
+/manuscripts/*
+!/manuscripts/README.md
+/dist-ebooks/

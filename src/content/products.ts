@@ -23,6 +23,8 @@ export const categories = [
 
 export type CategoryId = (typeof categories)[number]["id"];
 export type CoverLayout = "frame" | "band" | "split" | "stack";
+/** Tonos de tapa dentro de la paleta de marca. */
+export type CoverTone = "violet" | "lavender" | "ink" | "paper" | "deep";
 
 export type Chapter = { number: string; title: string; summary: string };
 
@@ -49,7 +51,7 @@ export type CatalogProduct = {
   minutes: number;
   outcomes: readonly string[];
   pairsWith: string | null;
-  cover: { kicker: string; headline: string; line: string; color: string; layout: CoverLayout };
+  cover: { kicker: string; headline: string; line: string; tone: CoverTone; layout: CoverLayout };
   chaptersNote: string;
   chapters: readonly Chapter[];
   forYou: readonly string[];
@@ -68,7 +70,7 @@ function soon(input: {
   priceArs: number;
   pages: number;
   minutes: number;
-  color: string;
+  tone: CoverTone;
   layout: CoverLayout;
   headline: string;
   line: string;
@@ -94,7 +96,7 @@ function soon(input: {
       kicker: "Cerebrika",
       headline: input.headline,
       line: input.line,
-      color: input.color,
+      tone: input.tone,
       layout: input.layout,
     },
   };
@@ -119,8 +121,8 @@ export const products: readonly CatalogProduct[] = [
     badge: "Destacado",
     fileName: "ia-para-docentes.pdf",
     storagePath: null,
-    pages: 48,
-    minutes: 55,
+    pages: 30,
+    minutes: 40,
     outcomes: [
       "Bajar la semana a cinco días con inicio, desarrollo y cierre.",
       "Pedirle a un chat una clase en castellano, sin jerga.",
@@ -131,10 +133,10 @@ export const products: readonly CatalogProduct[] = [
       kicker: "Cerebrika",
       headline: "IA para docentes",
       line: "Planificá tu semana en 1 hora",
-      color: "#3730A3",
+      tone: "violet",
       layout: "frame",
     },
-    chaptersNote: "Índice en borrador. Los capítulos todavía no están redactados.",
+    chaptersNote: "Índice completo: 30 páginas en PDF, con 16 pedidos para copiar y una checklist de revisión.",
     chapters: [
       { number: "01", title: "Para qué sirve la IA en el aula, y para qué no", summary: "Límites de la herramienta antes de usarla con un grupo." },
       { number: "02", title: "Tu primera conversación con un chat", summary: "Cómo abrir, pedir y volver a pedir, sin jerga." },
@@ -143,7 +145,7 @@ export const products: readonly CatalogProduct[] = [
       { number: "05", title: "Armar una clase que entra en el módulo", summary: "Inicio, desarrollo y cierre con tiempos." },
       { number: "06", title: "Actividades para ritmos distintos", summary: "Variar una misma consigna sin armar dos clases." },
       { number: "07", title: "Revisar lo que escribió la IA", summary: "Datos, tono y si se puede hacer de verdad." },
-      { number: "08", title: "Una rutina de una hora para toda la semana", summary: "El método, paso a paso, cuando el texto esté cerrado." },
+      { number: "08", title: "Una rutina de una hora para toda la semana", summary: "El método, paso a paso, con tiempos." },
     ],
     forYou: [
       "Planificás clases y el domingo se te va en eso.",
@@ -153,9 +155,8 @@ export const products: readonly CatalogProduct[] = [
     notForYou: [
       "Buscás aprender a programar.",
       "Ya armás todo tu trabajo con IA y querés un nivel avanzado.",
-      "Necesitás hoy el libro con el texto definitivo: el manuscrito sigue en preparación.",
     ],
-    manuscriptReady: false,
+    manuscriptReady: true,
   },
   soon({
     slug: "ia-para-devolver-trabajos",
@@ -166,7 +167,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 36,
     minutes: 40,
-    color: "#6B4F3B",
+    tone: "lavender",
     layout: "band",
     headline: "Devolver trabajos",
     line: "El finde, para vos",
@@ -190,7 +191,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 32,
     minutes: 35,
-    color: "#EA580C",
+    tone: "ink",
     layout: "split",
     headline: "La reunión",
     line: "Decisiones, no notas",
@@ -214,7 +215,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 40,
     minutes: 45,
-    color: "#DC2626",
+    tone: "paper",
     layout: "stack",
     headline: "La semana laboral",
     line: "Una hora, cinco días",
@@ -238,7 +239,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 28,
     minutes: 30,
-    color: "#3730A3",
+    tone: "violet",
     layout: "band",
     headline: "El mail",
     line: "El que venís postergando",
@@ -262,7 +263,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 36,
     minutes: 40,
-    color: "#EA580C",
+    tone: "ink",
     layout: "frame",
     headline: "Estudiar",
     line: "Un tema en 45 minutos",
@@ -286,7 +287,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 30,
     minutes: 35,
-    color: "#DC2626",
+    tone: "paper",
     layout: "split",
     headline: "El parcial",
     line: "La tarde anterior",
@@ -310,7 +311,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 34,
     minutes: 40,
-    color: "#6B4F3B",
+    tone: "lavender",
     layout: "stack",
     headline: "Leer un paper",
     line: "Sin perder el hilo",
@@ -334,7 +335,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 38,
     minutes: 45,
-    color: "#111111",
+    tone: "deep",
     layout: "frame",
     headline: "La hoja en blanco",
     line: "Un borrador, hoy",
@@ -358,7 +359,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 32,
     minutes: 40,
-    color: "#DC2626",
+    tone: "paper",
     layout: "band",
     headline: "Un cuento",
     line: "De una sentada",
@@ -382,7 +383,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 34,
     minutes: 40,
-    color: "#EA580C",
+    tone: "ink",
     layout: "stack",
     headline: "Tu CV",
     line: "Hechos, no adjetivos",
@@ -406,7 +407,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 9000,
     pages: 36,
     minutes: 40,
-    color: "#3730A3",
+    tone: "violet",
     layout: "split",
     headline: "La entrevista",
     line: "Tus casos, no un manual",
@@ -430,7 +431,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 28,
     minutes: 30,
-    color: "#6B4F3B",
+    tone: "lavender",
     layout: "frame",
     headline: "El menú",
     line: "Cinco comidas, una lista",
@@ -454,7 +455,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 7000,
     pages: 24,
     minutes: 25,
-    color: "#EA580C",
+    tone: "ink",
     layout: "band",
     headline: "El desorden",
     line: "Una zona, una hora",
@@ -478,7 +479,7 @@ export const products: readonly CatalogProduct[] = [
     priceArs: 8000,
     pages: 30,
     minutes: 35,
-    color: "#DC2626",
+    tone: "paper",
     layout: "stack",
     headline: "Un viaje corto",
     line: "Tres días, un plan",
@@ -608,3 +609,4 @@ export function resolvePaidProduct(payment: PaymentMatch): Product | null {
   }
   return null;
 }
+
