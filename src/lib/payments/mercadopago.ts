@@ -91,7 +91,8 @@ export async function createCheckoutPreference(
       ...(https
         ? {
             auto_return: "approved",
-            notification_url: `${siteUrl}/api/webhooks/mercadopago`,
+            // source_news=webhooks: Mercado Pago manda solo el formato Webhooks (firmado), no el IPN viejo sin firma.
+            notification_url: `${siteUrl}/api/webhooks/mercadopago?source_news=webhooks`,
           }
         : {}),
     },
