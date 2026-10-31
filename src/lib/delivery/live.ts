@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { getProduct } from "@/content/products";
 import { deliverDigitalOrder } from "@/lib/delivery/deliver-order";
 import type { DeliveryDeps } from "@/lib/delivery/types";
-import { createResendMailer } from "@/lib/email/resend-mailer";
+import { createMailer } from "@/lib/email/mailer";
 import { getDownloadTtlHours, getSiteUrl } from "@/lib/env";
 import type { NormalizedApprovedPayment } from "@/lib/payments/types";
 import { createSupabaseOrderStore } from "@/lib/supabase/order-store";
@@ -10,7 +10,7 @@ import { createSupabaseOrderStore } from "@/lib/supabase/order-store";
 export function createDeliveryDeps(productTitle: string): DeliveryDeps {
   return {
     store: createSupabaseOrderStore(),
-    mailer: createResendMailer(),
+    mailer: createMailer(),
     siteUrl: getSiteUrl(),
     productTitle,
     ttlHours: getDownloadTtlHours(),

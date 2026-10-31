@@ -167,6 +167,38 @@ export function createSupabaseOrderStore(): OrderStore {
       });
     },
 
+    async listDownloadsByPayment(provider, providerPaymentId) {
+      const order = await supabase
+        .from("orders")
+        .select("id, product_slug, download_token, download_expires_at")
+        .eq("provider", provider)
+        .eq("provider_payment_id", providerPaymentId)
+        .maybeSingle();
+      if (order.error) throw order.error;
+      if (!order.data) return [];
+      const items = await supabase
+        .from("order_items")
+        .select("product_slug, title, download_token, download_expires_at")
+        .eq("order_id", order.data.id);
+      if (items.error) throw items.error;
+      if (items.data?.length) {
+        return items.data.map((row) => ({
+          title: String(row.title),
+          slug: String(row.product_slug),
+          downloadToken: String(row.download_token),
+          downloadExpiresAt: String(row.download_expires_at),
+        }));
+      }
+      return [
+        {
+          title: String(order.data.product_slug),
+          slug: String(order.data.product_slug),
+          downloadToken: String(order.data.download_token),
+          downloadExpiresAt: String(order.data.download_expires_at),
+        },
+      ];
+    },
+
     async extendDownloads(email, expiresAt) {
       const orders = await supabase.from("orders").update({ download_expires_at: expiresAt }).eq("email", email).select("id");
       if (orders.error) throw orders.error;

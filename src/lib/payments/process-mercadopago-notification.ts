@@ -94,6 +94,29 @@ export async function handleMercadoPagoWebhook(
     };
   }
 
+  const delivered = await deliverApprovedPayment(payment, dataId, deps);
+  if (!delivered.ok) {
+    return { status: 200, body: { ok: true, action: "ignored", reason: delivered.reason } };
+  }
+  const result = delivered.result;
+  return { status: 200, body: { ok: true, action: result.outcome, orderId: result.orderId } };
+}
+
+export type DeliverApprovedResult =
+  | { ok: true; result: DeliverResult }
+  | { ok: false; reason: "not_approved" | "cart_mismatch" | "unrelated_product" };
+
+/**
+ * Entrega un pago que ya se consultó a Mercado Pago. La usan el webhook y la página
+ * de éxito: la primera que llega graba el pedido y manda el mail; la otra encuentra
+ * el pedido ya hecho (es único por proveedor + id de pago) y no duplica nada.
+ */
+export async function deliverApprovedPayment(
+  payment: FetchedPayment,
+  fallbackId: string,
+  deps: Pick<MercadoPagoHandlerDeps, "acceptProduct" | "deliver">,
+): Promise<DeliverApprovedResult> {
+  if (payment.status !== "approved") return { ok: false, reason: "not_approved" };
   if (!payment.email) {
     throw new Error("approved_payment_missing_email");
   }
@@ -105,11 +128,11 @@ export async function handleMercadoPagoWebhook(
     const quote = quoteCart(cartSlugs, payment.coupon || undefined);
     if (!quote.ok || Math.abs(payment.amount - quote.total) > 1) {
       console.error("webhook_mercadopago_cart_mismatch", payment.id);
-      return { status: 200, body: { ok: true, action: "ignored", reason: "cart_mismatch" } };
+      return { ok: false, reason: "cart_mismatch" };
     }
     const result = await deps.deliver({
       provider: "mercadopago",
-      providerPaymentId: payment.id || dataId,
+      providerPaymentId: payment.id || fallbackId,
       email: payment.email,
       amount: payment.amount,
       currency: payment.currency,
@@ -117,18 +140,18 @@ export async function handleMercadoPagoWebhook(
       items: quote.lines,
       metadata: { source: "mercadopago", product_slugs: cartSlugs.join(",") },
     });
-    return { status: 200, body: { ok: true, action: result.outcome, orderId: result.orderId } };
+    return { ok: true, result };
   }
 
   const accepted = deps.acceptProduct(payment);
   if (!accepted || !paymentMatchesProduct(payment, accepted.productId)) {
     console.error("webhook_mercadopago_unrelated", payment.id);
-    return { status: 200, body: { ok: true, action: "ignored", reason: "unrelated_product" } };
+    return { ok: false, reason: "unrelated_product" };
   }
 
   const result = await deps.deliver({
     provider: "mercadopago",
-    providerPaymentId: payment.id || dataId,
+    providerPaymentId: payment.id || fallbackId,
     email: payment.email,
     amount: payment.amount,
     currency: payment.currency,
@@ -137,5 +160,5 @@ export async function handleMercadoPagoWebhook(
     metadata: { source: "mercadopago" },
   });
 
-  return { status: 200, body: { ok: true, action: result.outcome, orderId: result.orderId } };
+  return { ok: true, result };
 }

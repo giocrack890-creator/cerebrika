@@ -1,6 +1,6 @@
 import { getProduct } from "@/content/products";
 import { deliveryEmail } from "@/lib/email/templates";
-import { createResendMailer } from "@/lib/email/resend-mailer";
+import { createMailer } from "@/lib/email/mailer";
 import { getDownloadTtlHours, getSiteUrl } from "@/lib/env";
 import { jsonError, jsonOk, parseContactForm } from "@/lib/forms";
 import { createSupabaseOrderStore } from "@/lib/supabase/order-store";
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         expiresAt: expires,
         items,
       });
-      await createResendMailer().send({ to: form.email, ...mail });
+      await createMailer().send({ to: form.email, ...mail });
     }
     return jsonOk({ message });
   } catch (error) {
