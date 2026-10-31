@@ -25,6 +25,7 @@ const columns = [
       ["Términos", "/legal/terminos"],
       ["Privacidad", "/legal/privacidad"],
       ["Reembolsos", "/legal/reembolsos"],
+      ["Botón de arrepentimiento", "/arrepentimiento"],
     ],
   },
 ] as const;

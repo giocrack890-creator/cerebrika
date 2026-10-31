@@ -6,9 +6,7 @@ Los textos de la página están en [`src/content/site.ts`](src/content/site.ts).
 
 ## Qué es placeholder
 
-- El manuscrito **no está publicado**. `manuscriptReady` del ebook en `src/content/products.ts` está en `false`, y cada botón de compra lo avisa al lado.
-- La descarga, mientras no configures Storage, es `private/ebook/placeholder.pdf`.
-- El índice de capítulos está marcado como borrador.
+- El texto de «IA para docentes» está terminado (`manuscriptReady: true`), pero **mientras no subas el PDF a Storage** la descarga es `private/ebook/placeholder.pdf` y cada botón de compra lo avisa al lado. El aviso se apaga solo cuando `EBOOK_STORAGE_BUCKET` y `EBOOK_STORAGE_PATH` están cargadas (hay que volver a desplegar).
 - Las opiniones: la home **no muestra** la sección mientras no haya opiniones con `placeholder: false`. No agregues frases inventadas.
 - Un texto de `src/content/site.ts` que empieza con `[` es un marcador y **no se muestra al público**: los datos de quien vende en el pie, la respuesta de reembolsos del FAQ y la garantía (`guarantee.confirmed: false`). Completalos antes de publicar; mientras tanto el sitio simplemente no los muestra.
 - `PRICE_ARS=12000` en `.env.example` es un ejemplo de configuración, no un tipo de cambio.
@@ -167,6 +165,7 @@ Migraciones, en este orden, en el SQL Editor de Supabase (o `supabase db push`):
 1. `supabase/migrations/20261030213000_orders_and_leads.sql`
 2. `supabase/migrations/20261030230000_product_slug_and_lead_sources.sql`
 3. `supabase/migrations/20261030234500_order_items.sql`
+4. `supabase/migrations/20261031160000_revocation_requests.sql` (Botón de arrepentimiento)
 
 Variables en Vercel → Settings → Environment Variables (Production):
 
@@ -183,12 +182,20 @@ Variables en Vercel → Settings → Environment Variables (Production):
 | `PRICE_ARS` | Precio entero en pesos |
 | `EBOOK_STORAGE_BUCKET` / `EBOOK_STORAGE_PATH` | `ebooks` / `ia-para-docentes.pdf`, cuando subas el PDF real |
 | `DOWNLOAD_TTL_HOURS` | Opcional, por defecto 72 |
+| `SUPPORT_EMAIL` | Tu casilla de soporte: recibe los pedidos del Botón de arrepentimiento |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Opcional |
+
+El PDF del ebook:
+
+1. El manuscrito vive en `manuscripts/ia-para-docentes.ts`, **fuera de git**: el repo es público y commitearlo regalaría el libro. Guardá un respaldo fuera del repo.
+2. Generalo con `npm run ebook:pdf -- ia-para-docentes`. Sale en `dist-ebooks/ia-para-docentes.pdf`, también ignorado por git.
+3. En Supabase → Storage, abrí el bucket privado `ebooks` (lo crea la primera migración) y subí el archivo con el nombre `ia-para-docentes.pdf`.
+4. Cargá `EBOOK_STORAGE_BUCKET=ebooks` y `EBOOK_STORAGE_PATH=ia-para-docentes.pdf` en Vercel y volvé a desplegar.
 
 Antes de anunciar:
 
-- Subí el PDF real, completá las dos variables de Storage y pasá `manuscriptReady` a `true`.
-- Completá en `src/content/site.ts` los datos de quien vende (nombre, contacto, CUIT) y la política de reembolsos, y redactá las páginas de `src/app/legal/[page]/page.tsx`.
+- Subí el PDF (pasos de arriba).
+- Completá en `src/content/site.ts` los datos de quien vende (nombre, contacto, CUIT). Revisá con tu contador o abogado los textos de `src/content/legal.ts` y definí si ofrecés garantía (`guarantee.confirmed`).
 - Configurá el webhook de producción en Mercado Pago y hacé una compra real chica para ver el mail.
 
 ## Personalizar
