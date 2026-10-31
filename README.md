@@ -102,6 +102,8 @@ Hay dos mails: la descarga del ebook y los 10 prompts.
 4. Cuando el deploy esté verde, configurá el webhook de Mercado Pago con `https://TU-DOMINIO/api/webhooks/mercadopago`.
 5. Hacé una compra de prueba. Si el pago se aprueba, el mail llega solo. Las páginas `/pago/exito`, `/pago/error` y `/pago/pendiente` no entregan el archivo: la entrega la hace el webhook.
 
+La entrega no depende solo del webhook: cuando la persona vuelve a `/pago/exito`, el servidor confirma el pago con la API de Mercado Pago, graba el pedido, manda el mail y muestra el botón de descarga. Para mostrarlo exige que el `external_reference` del link coincida con el del pago (un UUID que solo tiene quien pagó). El webhook sigue sirviendo para quien cierra la pestaña antes de volver.
+
 La preferencia manda `notification_url` con `?source_news=webhooks`, así Mercado Pago avisa solo en el formato Webhooks (el que trae firma) y no con el IPN viejo.
 
 ## 4b. Píxel de Meta
@@ -176,8 +178,8 @@ Variables en Vercel → Settings → Environment Variables (Production):
 | `MERCADOPAGO_SANDBOX` | `false` |
 | `SUPABASE_URL` | Project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | `service_role` |
-| `RESEND_API_KEY` | API key de Resend |
-| `EMAIL_FROM` | `Cerebrika <hola@tu-dominio-verificado>` |
+| `GMAIL_USER` / `GMAIL_APP_PASSWORD` | Sin dominio propio: tu Gmail y una contraseña de aplicación de Google |
+| `RESEND_API_KEY` / `EMAIL_FROM` | Solo si tenés dominio verificado en Resend (si cargás Gmail, no hacen falta) |
 | `SITE_URL` | `https://tu-dominio`, sin barra final |
 | `PRICE_ARS` | Precio entero en pesos |
 | `EBOOK_STORAGE_BUCKET` / `EBOOK_STORAGE_PATH` | `ebooks` / `ia-para-docentes.pdf`, cuando subas el PDF real |

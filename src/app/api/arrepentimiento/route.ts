@@ -1,4 +1,4 @@
-import { createResendMailer } from "@/lib/email/resend-mailer";
+import { createMailer } from "@/lib/email/mailer";
 import { jsonError, jsonOk } from "@/lib/forms";
 import {
   parseRevocation,
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     });
     if (error) throw error;
 
-    const mailer = createResendMailer();
+    const mailer = createMailer();
     await mailer.send({ to: input.email, ...revocationBuyerEmail(code) });
     const support = process.env.SUPPORT_EMAIL?.trim();
     if (support) {

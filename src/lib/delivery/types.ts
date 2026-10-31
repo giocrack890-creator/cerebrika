@@ -43,6 +43,10 @@ export interface OrderStore {
     items: { slug: string; title: string; unitPrice: number; downloadToken: string; downloadExpiresAt: string }[],
   ): Promise<void>;
   listDownloadsByEmail?(email: string): Promise<{ title: string; slug: string; downloadToken: string; downloadExpiresAt: string }[]>;
+  listDownloadsByPayment?(
+    provider: NormalizedApprovedPayment["provider"],
+    providerPaymentId: string,
+  ): Promise<{ title: string; slug: string; downloadToken: string; downloadExpiresAt: string }[]>;
   extendDownloads?(email: string, expiresAt: string): Promise<void>;
 }
 
