@@ -19,7 +19,7 @@ function isActive(pathname: string, href: string) {
 
 export function Logo({ className = "" }: { className?: string }) {
   return (
-    <Link href="/" className={`font-display text-[19px] font-bold tracking-[-0.03em] ${className}`}>
+    <Link href="/" className={`font-display text-[18px] font-black tracking-[-0.03em] ${className}`}>
       cerebrika
     </Link>
   );
@@ -60,8 +60,8 @@ export function SiteHeader({ cta }: { cta?: React.ReactNode }) {
         Saltar al contenido
       </a>
       <header
-        className={`sticky top-0 z-50 transition-[background-color,box-shadow] duration-200 ${
-          scrolled ? "bg-paper/90 shadow-[0_1px_0_var(--line)] backdrop-blur-md" : "bg-paper"
+        className={`sticky top-0 z-50 text-white transition-[background-color,box-shadow] duration-200 ${
+          scrolled ? "bg-night/95 shadow-[0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-md" : "bg-night"
         }`}
       >
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-5 sm:px-8">
@@ -74,7 +74,7 @@ export function SiteHeader({ cta }: { cta?: React.ReactNode }) {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`text-[14px] font-medium transition-colors ${active ? "text-ink" : "text-muted hover:text-ink"}`}
+                  className={`text-[14px] font-semibold transition-colors ${active ? "text-white" : "text-white/65 hover:text-white"}`}
                 >
                   {link.label}
                 </Link>
@@ -85,20 +85,20 @@ export function SiteHeader({ cta }: { cta?: React.ReactNode }) {
             {cta ? <div className="hidden sm:block">{cta}</div> : null}
             <button
               type="button"
-              className="relative flex h-10 w-10 items-center justify-center rounded-[12px] transition-colors hover:bg-black/[0.04]"
+              className="relative flex h-10 w-10 items-center justify-center rounded-[12px] transition-colors hover:bg-white/10"
               aria-label={count === 0 ? "Carrito vacío" : `Carrito, ${count} ${count === 1 ? "ebook" : "ebooks"}`}
               onClick={() => cart.openDrawer()}
             >
               <BagIcon />
               {count > 0 ? (
-                <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white">
+                <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-bright px-1 text-[10px] font-bold text-night">
                   {count}
                 </span>
               ) : null}
             </button>
             <button
               type="button"
-              className="flex h-10 w-10 items-center justify-center rounded-[12px] transition-colors hover:bg-black/[0.04] md:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-[12px] transition-colors hover:bg-white/10 md:hidden"
               aria-expanded={menuOpen}
               aria-controls={menuId}
               aria-label="Abrir menú"
@@ -150,5 +150,26 @@ export function SiteHeader({ cta }: { cta?: React.ReactNode }) {
         </div>
       ) : null}
     </>
+  );
+}
+
+/** Botón del carrito suelto, para la barra oscura del hero. */
+export function CartButton({ className = "" }: { className?: string }) {
+  const cart = useCart();
+  const count = cart.slugs.length;
+  return (
+    <button
+      type="button"
+      className={`relative flex h-10 w-10 items-center justify-center rounded-[12px] transition-colors ${className}`}
+      aria-label={count === 0 ? "Carrito vacío" : `Carrito, ${count} ${count === 1 ? "ebook" : "ebooks"}`}
+      onClick={() => cart.openDrawer()}
+    >
+      <BagIcon />
+      {count > 0 ? (
+        <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-bright px-1 text-[10px] font-bold text-night">
+          {count}
+        </span>
+      ) : null}
+    </button>
   );
 }

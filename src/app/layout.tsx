@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, Geist } from "next/font/google";
+import { Inter_Tight, Literata } from "next/font/google";
 import { Suspense } from "react";
 import { MetaPixel } from "@/components/analytics/meta-pixel";
 import { CartProvider } from "@/components/store/cart-provider";
@@ -8,15 +8,15 @@ import { site } from "@/content/site";
 import { getWhatsappNumber } from "@/lib/env";
 import "./globals.css";
 
-const geist = Geist({
+const interTight = Inter_Tight({
   subsets: ["latin"],
-  variable: "--font-geist",
+  variable: "--font-inter-tight",
   display: "swap",
 });
 
-const bricolage = Bricolage_Grotesque({
+const literata = Literata({
   subsets: ["latin"],
-  variable: "--font-bricolage",
+  variable: "--font-literata",
   display: "swap",
 });
 
@@ -49,14 +49,14 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f6f2",
+  themeColor: "#1f1e24",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const whatsapp = getWhatsappNumber();
   const announcement = storeConfig.announcement.trim();
   return (
-    <html lang="es-AR" className={`${geist.variable} ${bricolage.variable} h-full antialiased`}>
+    <html lang="es-AR" className={`${interTight.variable} ${literata.variable} h-full antialiased`}>
       <body className="min-h-full bg-paper font-sans text-ink">
         {announcement ? (
           <p className="bg-accent px-4 py-2 text-center text-[13px] font-medium text-white">{announcement}</p>

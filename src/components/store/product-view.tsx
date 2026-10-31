@@ -62,11 +62,11 @@ export function ProductView({
               </p>
               <ShareButton title={product.title} />
             </div>
-            <h1 className="font-display mt-4 text-[clamp(2.1rem,8vw,3.5rem)] leading-[0.98] font-bold tracking-[-0.04em]">
+            <h1 className="font-display mt-4 text-[clamp(2.1rem,8vw,3.5rem)] leading-[0.98] font-black tracking-[-0.045em]">
               {product.promise}
             </h1>
             <p className="mt-3 text-[15px] font-medium text-muted">{product.title}</p>
-            <p className="mt-4 text-[16px] leading-relaxed text-muted">{product.description}</p>
+            <p className="mt-4 font-serif text-[17px] leading-relaxed text-ink">{product.description}</p>
 
             {product.rating && product.rating.count > 0 ? (
               <p className="mt-4 text-[14px] font-medium">
@@ -105,7 +105,7 @@ export function ProductView({
 
             <ul className="mt-8 space-y-3 border-t border-line pt-6">
               {product.outcomes.map((item) => (
-                <li key={item} className="flex gap-3 text-[15px] leading-snug">
+                <li key={item} className="flex gap-3 font-serif text-[16px] leading-snug">
                   <CheckIcon className="mt-0.5 h-5 w-5 shrink-0 text-accent" />
                   {item}
                 </li>
@@ -195,11 +195,11 @@ export function ProductView({
         detail={comingSoon ? "Próximamente" : priceLabel ? `${priceLabel} · pago único` : "Pago único"}
       >
         {comingSoon ? (
-          <a href={avisoHref} className="btn btn-ink btn-sm">
-            Avisame
+          <a href={avisoHref} className="btn btn-light h-12 w-full font-bold sm:w-auto">
+            Avisame cuando salga
           </a>
         ) : (
-          <BuyButton className="btn btn-primary btn-sm">Comprar</BuyButton>
+          <BuyButton className="btn btn-light h-12 w-full font-bold sm:w-auto">Comprar el ebook{priceLabel ? ` — ${priceLabel}` : ""}</BuyButton>
         )}
       </StickyBuyBar>
       {!comingSoon && price ? (
